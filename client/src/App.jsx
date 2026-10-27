@@ -11,6 +11,7 @@ import Activity from './pages/Activity.jsx';
 import Profile from './pages/Profile.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import NotFound from './pages/NotFound.jsx';
+import ComponentDemo from './pages/ComponentDemo.jsx';
 
 const App = () => (
   <Routes>
@@ -27,6 +28,7 @@ const App = () => (
       <Route path="/projects/:projectId/activity" element={<Activity />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/admin/users" element={<AdminUsers />} />
+      {import.meta.env.DEV && <Route path="/dev/components" element={<ComponentDemo />} />}
       <Route path="*" element={<NotFound />} />
     </Route>
   </Routes>
