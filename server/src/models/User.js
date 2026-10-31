@@ -3,7 +3,9 @@
 //   email    String, required, unique, lowercase, trimmed, valid format
 //   password String, required, min 6 chars, never selected by default and removed from toJSON
 //   role     String, "user" or "admin", default "user"
-// bcrypt hashing is added in M2.1 (a pre-save hook); validation runs before hashing.
+// The password is hashed with bcryptjs in a pre-save hook, which runs after validation,
+// so minlength 6 checks the plain-text password.
+import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { USER_ROLES } from '../utils/constants.js';
 
@@ -42,5 +44,14 @@ const userSchema = new mongoose.Schema(
     },
   }
 );
+
+userSchema.pre('save', async function hashPassword() {
+  if (!this.isModified('password')) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+userSchema.methods.comparePassword = function comparePassword(plain) {
+  return bcrypt.compare(plain, this.password);
+};
 
 export default mongoose.model('User', userSchema);
