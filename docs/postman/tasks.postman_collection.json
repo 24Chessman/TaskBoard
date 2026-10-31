@@ -1,0 +1,593 @@
+{
+  "info": {
+    "name": "TaskBoard Tasks",
+    "description": "M3.3 task endpoints. Run the requests in order: setup registers user A (project owner) and user B (not a project member, used as the outsider), creates a project, and everything after reuses those values.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "password", "value": "secret123" },
+    { "key": "runId", "value": "" },
+    { "key": "tokenA", "value": "" },
+    { "key": "tokenB", "value": "" },
+    { "key": "userAId", "value": "" },
+    { "key": "projectId", "value": "" },
+    { "key": "taskId", "value": "" },
+    { "key": "taskId2", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Register user A (project owner)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('runId', String(Date.now()));"] }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('tokenA', body.data.token);",
+                  "pm.collectionVariables.set('userAId', body.data.user._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Tasks A\",\n  \"email\": \"tasks-a-{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Register user B (outsider)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('tokenB', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Tasks B\",\n  \"email\": \"tasks-b-{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Create project (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('projectId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Tasks Project {{runId}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects", "host": ["{{baseUrl}}"], "path": ["projects"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Success flow",
+      "item": [
+        {
+          "name": "Create task (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const task = pm.response.json().data;",
+                  "pm.test('defaults and creator are set', () => {",
+                  "  pm.expect(task.status).to.eql('todo');",
+                  "  pm.expect(task.priority).to.eql('high');",
+                  "  pm.expect(task.createdBy._id).to.eql(pm.collectionVariables.get('userAId'));",
+                  "  pm.expect(task.assignee._id).to.eql(pm.collectionVariables.get('userAId'));",
+                  "});",
+                  "pm.collectionVariables.set('taskId', task._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Write login page\",\n  \"description\": \"Build the form and wire it to the API\",\n  \"priority\": \"high\",\n  \"assignee\": \"{{userAId}}\",\n  \"labels\": [\"Frontend\", \"auth\"],\n  \"dueDate\": \"2030-06-01\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "Create second task (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('taskId2', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Update docs\",\n  \"priority\": \"low\",\n  \"status\": \"review\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "List tasks - no filters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('both tasks, default paging', () => {",
+                  "  pm.expect(body.total).to.eql(2);",
+                  "  pm.expect(body.page).to.eql(1);",
+                  "  pm.expect(body.limit).to.eql(50);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "List tasks - filter by priority and label",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('only the high priority frontend task', () => {",
+                  "  pm.expect(body.total).to.eql(1);",
+                  "  pm.expect(body.data[0]._id).to.eql(pm.collectionVariables.get('taskId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks?priority=high&label=FRONTEND",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "tasks"],
+              "query": [
+                { "key": "priority", "value": "high" },
+                { "key": "label", "value": "FRONTEND" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List tasks - search, due date and sort",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('search and dueBefore narrow to one task', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.total).to.eql(1);",
+                  "  pm.expect(body.data[0].title).to.eql('Write login page');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks?search=login&dueBefore=2031-01-01&sort=dueDate",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "tasks"],
+              "query": [
+                { "key": "search", "value": "login" },
+                { "key": "dueBefore", "value": "2031-01-01" },
+                { "key": "sort", "value": "dueDate" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List tasks - sorted by priority with paging",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('high priority first, one per page', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.limit).to.eql(1);",
+                  "  pm.expect(body.total).to.eql(2);",
+                  "  pm.expect(body.data[0].priority).to.eql('high');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks?sort=priority&page=1&limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "tasks"],
+              "query": [
+                { "key": "sort", "value": "priority" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get task (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('labels are lowercase', () => pm.expect(pm.response.json().data.labels).to.eql(['frontend', 'auth']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        },
+        {
+          "name": "Update task - full replace (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const task = pm.response.json().data;",
+                  "pm.test('title changed and omitted fields were cleared', () => {",
+                  "  pm.expect(task.title).to.eql('Write login and register pages');",
+                  "  pm.expect(task.description).to.eql('');",
+                  "  pm.expect(task.assignee).to.eql(null);",
+                  "  pm.expect(task.labels).to.eql([]);",
+                  "  pm.expect(task.priority).to.eql('medium');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Write login and register pages\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        },
+        {
+          "name": "Change task status (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('task moved to in_progress', () => pm.expect(pm.response.json().data.status).to.eql('in_progress'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"in_progress\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}/status", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Failure cases",
+      "item": [
+        {
+          "name": "List tasks - no token",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 401', () => pm.response.to.have.status(401));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "List tasks - outsider (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "Create task - outsider (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Should not be created\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "Create task - empty title",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('errors array names the field', () => pm.expect(pm.response.json().errors[0].field).to.eql('title'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "Create task - assignee is not a project member",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 400', () => pm.response.to.have.status(400));"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Bad assignee\",\n  \"assignee\": \"000000000000000000000001\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "List tasks - invalid filter value",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 400', () => pm.response.to.have.status(400));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks?status=finished",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "tasks"],
+              "query": [{ "key": "status", "value": "finished" }]
+            }
+          }
+        },
+        {
+          "name": "Get task - invalid id",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 400', () => pm.response.to.have.status(400));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/not-an-id", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "not-an-id"] }
+          }
+        },
+        {
+          "name": "Get task - unknown id",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 404', () => pm.response.to.have.status(404));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/000000000000000000000001", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "000000000000000000000001"] }
+          }
+        },
+        {
+          "name": "Change status - invalid value",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 400', () => pm.response.to.have.status(400));"] }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"finished\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}/status", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}", "status"] }
+          }
+        },
+        {
+          "name": "Update task - outsider (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"] }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Hijacked\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        },
+        {
+          "name": "Delete task - outsider (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"] }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete and cleanup",
+      "item": [
+        {
+          "name": "Delete task (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 204', () => pm.response.to.have.status(204));"] }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        },
+        {
+          "name": "Get deleted task (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 404', () => pm.response.to.have.status(404));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}"] }
+          }
+        },
+        {
+          "name": "Delete project (A) - also removes the remaining task",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 204', () => pm.response.to.have.status(204));"] }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
