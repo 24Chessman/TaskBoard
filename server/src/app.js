@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
+import projectRoutes from './routes/project.routes.js';
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -39,6 +40,7 @@ app.get('/api/health', (req, res) => {
 
 // 5. Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
 
 // 6. Not found middleware (unmatched routes)
 app.use(notFound);
