@@ -6,11 +6,27 @@ const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
 });
 
-const getToken = () => {
+export const getToken = () => {
   try {
     return localStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
+  }
+};
+
+export const setToken = (token) => {
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    // storage unavailable: the session lasts until the page is closed
+  }
+};
+
+export const clearToken = () => {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // nothing to clear
   }
 };
 
@@ -22,6 +38,22 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 handling is added in M2.2
+// A 401 anywhere except login/register means the session is gone: clear it and go to /login.
+// A failed login also returns 401, so those two requests are skipped.
+const AUTH_PATHS = ['/auth/login', '/auth/register'];
+
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const url = error.config?.url || '';
+    if (error.response?.status === 401 && !AUTH_PATHS.some((path) => url.includes(path))) {
+      clearToken();
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login?reason=expired');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axiosClient;
