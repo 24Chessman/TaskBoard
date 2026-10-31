@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
+import ProjectLayout from './components/ProjectLayout.jsx';
 import AdminRoute from './routes/AdminRoute.jsx';
 import GuestRoute from './routes/GuestRoute.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
@@ -34,10 +35,12 @@ const App = () => (
         <Route path="/" element={<Navigate to="/projects" replace />} />
         <Route path="/projects" element={<ProjectList />} />
         <Route path="/projects/new" element={<ProjectCreate />} />
-        <Route path="/projects/:projectId" element={<Board />} />
-        <Route path="/projects/:projectId/settings" element={<ProjectSettings />} />
-        <Route path="/projects/:projectId/dashboard" element={<Dashboard />} />
-        <Route path="/projects/:projectId/activity" element={<Activity />} />
+        <Route path="/projects/:projectId" element={<ProjectLayout />}>
+          <Route index element={<Board />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="activity" element={<Activity />} />
+          <Route path="settings" element={<ProjectSettings />} />
+        </Route>
         <Route path="/profile" element={<Profile />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin/users" element={<AdminUsers />} />

@@ -1,7 +1,7 @@
-import { useParams } from 'react-router-dom';
+import useProject from '../hooks/useProject.js';
 
 const Activity = () => {
-  const { projectId } = useParams();
+  const { project, projectRole } = useProject();
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -10,7 +10,10 @@ const Activity = () => {
         Route: <code className="rounded bg-slate-100 px-1.5 py-0.5">/projects/:projectId/activity</code>
       </p>
       <p className="mt-1 text-sm text-slate-600">
-        Project ID: <span className="font-mono font-medium">{projectId}</span>
+        Project: <span className="font-medium">{project.name}</span>
+      </p>
+      <p className="mt-1 text-sm text-slate-600">
+        Your role: <span className="font-medium">{projectRole}</span>
       </p>
       <p className="mt-1 text-sm text-slate-600">Module owner: Jaydip</p>
     </section>
