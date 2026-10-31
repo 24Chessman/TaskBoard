@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import authRoutes from './routes/auth.routes.js';
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -36,10 +37,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 5. Not found middleware (unmatched routes)
+// 5. Routes
+app.use('/api/auth', authRoutes);
+
+// 6. Not found middleware (unmatched routes)
 app.use(notFound);
 
-// 6. Centralized error handling middleware (must be last)
+// 7. Centralized error handling middleware (must be last)
 app.use(errorHandler);
 
 export default app;
