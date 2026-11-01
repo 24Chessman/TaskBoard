@@ -1,3 +1,70 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Colour roles as "R G B" triplets so Tailwind can add opacity (bg-brand/20). Values are the Tailwind palette. */
+  :root {
+    --color-app: 248 250 252; /* slate-50 */
+    --color-surface: 255 255 255; /* white */
+    --color-surface-muted: 241 245 249; /* slate-100 */
+    --color-line: 226 232 240; /* slate-200 */
+    --color-fg: 15 23 42; /* slate-900 */
+    --color-fg-secondary: 71 85 105; /* slate-600 */
+    --color-fg-muted: 100 116 139; /* slate-500 */
+
+    --color-brand: 79 70 229; /* indigo-600 */
+    --color-brand-hover: 67 56 202; /* indigo-700 */
+    --color-brand-soft: 238 242 255; /* indigo-50 */
+    --color-brand-fg: 67 56 202; /* indigo-700 */
+    --color-brand-ring: 99 102 241; /* indigo-500 */
+
+    --color-danger: 220 38 38; /* red-600 */
+    --color-danger-hover: 185 28 28; /* red-700 */
+    --color-danger-soft: 254 242 242; /* red-50 */
+    --color-danger-fg: 185 28 28; /* red-700 */
+    --color-success: 5 150 105; /* emerald-600 */
+    --color-success-soft: 236 253 245; /* emerald-50 */
+    --color-success-fg: 4 120 87; /* emerald-700 */
+    --color-warning: 245 158 11; /* amber-500 */
+    --color-warning-strong: 217 119 6; /* amber-600 */
+    --color-warning-soft: 255 251 235; /* amber-50 */
+    --color-warning-fg: 146 64 14; /* amber-800 */
+    --color-info: 2 132 199; /* sky-600 */
+    --color-info-soft: 240 249 255; /* sky-50 */
+    --color-info-fg: 3 105 161; /* sky-700 */
+    --color-neutral-soft: 241 245 249; /* slate-100 */
+    --color-neutral-fg: 51 65 85; /* slate-700 */
+  }
+
+  /* The page never scrolls sideways (clip, unlike hidden, keeps sticky headers working) */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  /* Base UI text is 14px. Set on body (not html) so rem-based spacing stays exactly as it was. */
+  body {
+    @apply bg-app font-sans text-fg antialiased;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  /* Visible keyboard focus everywhere; components with their own ring override it */
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-brand-ring));
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion: no transitions, no animations (the drawer, toasts and spinners stop moving) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
