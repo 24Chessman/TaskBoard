@@ -1,5 +1,6 @@
 // AuthProvider props: children. Holds { user, token, loading } and exposes
-// login(email, password), register(name, email, password) and logout().
+// login(email, password), register(name, email, password), logout() and updateUser(user).
+// updateUser replaces the stored user (for example after a profile edit) so the navbar shows the new name.
 // The token lives in localStorage ("taskboard_token"); on load it is used to restore the user via GET /auth/me.
 import { createContext, useEffect, useState } from 'react';
 import axiosClient, { clearToken, getToken, setToken } from '../api/axiosClient.js';
@@ -59,8 +60,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (nextUser) => setUser(nextUser);
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
