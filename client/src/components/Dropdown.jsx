@@ -109,7 +109,7 @@ const Dropdown = ({ label, triggerContent, triggerClassName = '', items = [], he
 
       {open && (
         <div
-          className={`absolute z-30 mt-2 min-w-56 animate-fade-in rounded-lg border border-line bg-surface py-1 shadow-xl ${align === 'end' ? 'right-0' : 'left-0'}`}
+          className={`absolute z-30 mt-2 min-w-56 animate-fade-in rounded-lg border border-line bg-surface py-1 shadow-lg ${align === 'end' ? 'right-0' : 'left-0'}`}
         >
           {header && <div className="border-b border-line px-3 py-2">{header}</div>}
           <div ref={menuRef} id={menuId} role="menu" aria-label={label} onKeyDown={handleMenuKeyDown}>

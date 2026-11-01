@@ -33,11 +33,11 @@ const Button = ({
     type={type}
     disabled={disabled || loading}
     aria-busy={loading || undefined}
-    className={`inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${sizes[size] || sizes.md} ${buttonVariants[variant] || buttonVariants.primary} ${className}`}
+    className={`inline-flex items-center justify-center rounded-md font-medium transition-colors active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${sizes[size] || sizes.md} ${buttonVariants[variant] || buttonVariants.primary} ${className}`}
     {...rest}
   >
     {loading ? (
-      <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+      <Loader2 size={16} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
     ) : (
       LeftIcon && <LeftIcon size={16} aria-hidden="true" />
     )}

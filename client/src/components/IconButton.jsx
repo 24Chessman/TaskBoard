@@ -17,7 +17,7 @@ const IconButton = ({ icon: Icon, label, variant = 'ghost', size = 'md', classNa
       type={type}
       aria-label={label}
       title={label}
-      className={`inline-flex shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${sizes[size] || sizes.md} ${buttonVariants[variant] || buttonVariants.ghost} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-md transition-colors active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${sizes[size] || sizes.md} ${buttonVariants[variant] || buttonVariants.ghost} ${className}`}
       {...rest}
     >
       <Icon size={size === 'sm' ? 14 : 16} aria-hidden="true" />

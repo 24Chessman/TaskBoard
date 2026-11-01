@@ -21,7 +21,7 @@ const Toast = ({ toasts, onClose }) => (
       return (
         <div
           key={toast.id}
-          className="pointer-events-auto flex animate-toast-in items-start gap-3 rounded-lg border border-line bg-surface p-3 text-sm text-fg shadow-xl"
+          className="pointer-events-auto flex animate-toast-in items-start gap-3 rounded-lg border border-line bg-surface p-3 text-sm text-fg shadow-lg"
         >
           <Icon size={18} aria-hidden="true" className={`mt-px shrink-0 ${kind.color}`} />
           <p className="min-w-0 flex-1 break-words">
