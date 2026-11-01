@@ -46,3 +46,27 @@ export const timeAgo = (iso, now = Date.now()) => {
 
 // True when a comment was changed more than a minute after it was written (so it shows "(edited)")
 export const wasEdited = (comment) => new Date(comment.updatedAt) - new Date(comment.createdAt) > MINUTE;
+
+// ---- Day grouping (activity feed): entries are grouped by the viewer's local calendar day.
+// The local calendar day of a timestamp as "YYYY-MM-DD"
+export const dayKey = (iso) => localDateKey(new Date(iso));
+
+// "Today", "Yesterday", or a readable date such as "Jun 1, 2030". now is a parameter for tests.
+export const dayLabel = (iso, now = new Date()) => {
+  const key = dayKey(iso);
+  if (key === localDateKey(now)) return 'Today';
+  if (key === localDateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1))) return 'Yesterday';
+  return formatDate(key);
+};
+
+// Splits a newest-first list into [{ key, label, items }], one group per day, keeping the order
+export const groupByDay = (entries, now = new Date()) => {
+  const groups = [];
+  entries.forEach((entry) => {
+    const key = dayKey(entry.createdAt);
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) last.items.push(entry);
+    else groups.push({ key, label: dayLabel(entry.createdAt, now), items: [entry] });
+  });
+  return groups;
+};

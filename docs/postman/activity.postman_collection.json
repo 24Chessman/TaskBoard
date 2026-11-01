@@ -1,0 +1,343 @@
+{
+  "info": {
+    "name": "TaskBoard Activity",
+    "description": "M4.3 project activity feed (read only: there are no write endpoints). Run the requests in order: Setup registers user A (project owner) and user B (an outsider), creates a project and a task, which produces activity.\n\nNote: activity is written just AFTER the response of the action that caused it, so the feed can lag a moment behind. If a count looks one short, wait a second and send the request again.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "password", "value": "secret123" },
+    { "key": "runId", "value": "" },
+    { "key": "tokenA", "value": "" },
+    { "key": "tokenB", "value": "" },
+    { "key": "projectId", "value": "" },
+    { "key": "taskId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Register user A (project owner)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('runId', String(Date.now()));"] }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('tokenA', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Activity A\",\n  \"email\": \"activity-a-{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Register user B (outsider)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('tokenB', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Activity B\",\n  \"email\": \"activity-b-{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Create project (A) - logs project.created",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('projectId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Activity Project {{runId}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects", "host": ["{{baseUrl}}"], "path": ["projects"] }
+          }
+        },
+        {
+          "name": "Create task (A) - logs task.created",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('taskId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Write the report\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks"] }
+          }
+        },
+        {
+          "name": "Move task to Review (A) - logs task.status_changed",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 200', () => pm.response.to.have.status(200));"] }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"review\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}/status", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "tasks", "{{taskId}}", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read the feed",
+      "item": [
+        {
+          "name": "Get the feed (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('has paging fields', () => {",
+                  "  pm.expect(body.page).to.eql(1);",
+                  "  pm.expect(body.limit).to.eql(10);",
+                  "  pm.expect(body.total).to.be.at.least(2);",
+                  "});",
+                  "pm.test('newest entry first, with a populated actor and a message', () => {",
+                  "  const first = body.data[0];",
+                  "  pm.expect(first.actor).to.have.property('name');",
+                  "  pm.expect(first.actor).to.have.property('email');",
+                  "  pm.expect(first.actor).to.not.have.property('password');",
+                  "  pm.expect(first.message).to.be.a('string').that.is.not.empty;",
+                  "  if (body.data.length > 1) pm.expect(new Date(first.createdAt) >= new Date(body.data[1].createdAt)).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/activity", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "activity"] }
+          }
+        },
+        {
+          "name": "Get the feed with page and limit (A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('page 2 of limit 1', () => {",
+                  "  pm.expect(body.page).to.eql(2);",
+                  "  pm.expect(body.limit).to.eql(1);",
+                  "  pm.expect(body.data).to.have.lengthOf(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/activity?page=2&limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "activity"],
+              "query": [
+                { "key": "page", "value": "2" },
+                { "key": "limit", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "A limit above 50 is capped at 50",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('limit is 50', () => pm.expect(pm.response.json().limit).to.eql(50));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/activity?limit=500",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectId}}", "activity"],
+              "query": [{ "key": "limit", "value": "500" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Failure cases",
+      "item": [
+        {
+          "name": "Get the feed - no token",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 401', () => pm.response.to.have.status(401));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/activity", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "activity"] }
+          }
+        },
+        {
+          "name": "Get the feed - outsider (B)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 403', () => pm.response.to.have.status(403));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/activity", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "activity"] }
+          }
+        },
+        {
+          "name": "Get the feed - invalid project id",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 400', () => pm.response.to.have.status(400));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/not-an-id/activity", "host": ["{{baseUrl}}"], "path": ["projects", "not-an-id", "activity"] }
+          }
+        },
+        {
+          "name": "Get the feed - unknown project",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 404', () => pm.response.to.have.status(404));"] }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/000000000000000000000001/activity", "host": ["{{baseUrl}}"], "path": ["projects", "000000000000000000000001", "activity"] }
+          }
+        },
+        {
+          "name": "Write attempt - POST to the feed is not allowed",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('there is no write endpoint: status is 404', () => pm.response.to.have.status(404));"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"task.created\",\n  \"message\": \"forged entry\"\n}" },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/activity", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "activity"] }
+          }
+        },
+        {
+          "name": "Write attempt - DELETE on the feed is not allowed",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('there is no delete endpoint: status is 404', () => pm.response.to.have.status(404));"] }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/activity", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "activity"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "Delete the project (A) - its activity is deleted with it",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('status is 204', () => pm.response.to.have.status(204));"] }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
