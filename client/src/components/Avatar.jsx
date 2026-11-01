@@ -1,4 +1,5 @@
-// Avatar props: user (an object with a name, or null/undefined for a deleted user), size ("sm" or "md").
+// Avatar props: user (an object with a name, or null/undefined when there is nobody), size ("sm" or "md"),
+// emptyLabel (what a missing user means, shown as the tooltip and screen reader name; default "Deleted user").
 // Shows a circle with the user's initials, or "?" when the user is missing.
 const sizes = {
   sm: 'h-6 w-6 text-xs',
@@ -14,8 +15,8 @@ export const getInitials = (name) => {
   return `${first}${last}`.toUpperCase();
 };
 
-const Avatar = ({ user, size = 'sm' }) => {
-  const label = user ? user.name : 'Deleted user';
+const Avatar = ({ user, size = 'sm', emptyLabel = 'Deleted user' }) => {
+  const label = user ? user.name : emptyLabel;
   return (
     <span
       role="img"

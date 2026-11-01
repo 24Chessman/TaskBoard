@@ -42,7 +42,7 @@ const TaskCard = ({ task, onOpen }) => {
         ) : (
           <span />
         )}
-        <Avatar user={task.assignee} />
+        <Avatar user={task.assignee} emptyLabel="Unassigned" />
       </span>
     </button>
   );

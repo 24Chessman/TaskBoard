@@ -12,6 +12,7 @@ import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
 import Loader from '../components/Loader.jsx';
 import Select from '../components/Select.jsx';
+import TaskModal from '../components/TaskModal.jsx';
 import useDebounce from '../hooks/useDebounce.js';
 import useFetch from '../hooks/useFetch.js';
 import useProject from '../hooks/useProject.js';
@@ -27,7 +28,7 @@ const PRIORITIES = ['low', 'medium', 'high'];
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 const Board = () => {
-  const { project } = useProject();
+  const { project, isOwner } = useProject();
   const [searchParams, setSearchParams] = useSearchParams();
   // Which task modal is open: null, { mode: 'create' } or { taskId }
   const [modal, setModal] = useState(null);
@@ -94,7 +95,6 @@ const Board = () => {
 
   const openCreate = () => setModal({ mode: 'create' });
   const openTask = (task) => setModal({ taskId: task._id });
-  // The task modal (create, view, edit, delete) is mounted here by the next commit, using `modal` and `refetch`.
 
   const renderBoard = () => {
     if (loading && !data) return <Loader label="Loading tasks" />;
@@ -203,6 +203,18 @@ const Board = () => {
       </form>
 
       {renderBoard()}
+
+      {modal && (
+        <TaskModal
+          key={modal.taskId || 'new'}
+          modal={modal}
+          tasks={data?.data || []}
+          project={project}
+          isOwner={isOwner}
+          onClose={() => setModal(null)}
+          onChanged={refetch}
+        />
+      )}
     </div>
   );
 };
