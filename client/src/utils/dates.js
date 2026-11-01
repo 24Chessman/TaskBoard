@@ -21,3 +21,28 @@ export const formatDate = (key) => {
 // True when the task has a due date before today and is not done
 export const isOverdue = (task, today = localDateKey()) =>
   Boolean(task.dueDate) && task.status !== 'done' && toDateKey(task.dueDate) < today;
+
+// ---- Timestamps (comments): moments, unlike the calendar dates above, are shown in the user's local time zone.
+const dateTimeFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+const relativeFormat = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const RELATIVE_DAYS_LIMIT = 30;
+
+// "2030-06-01T14:05:00.000Z" -> "Jun 1, 2030, 4:05 PM" (browser locale and time zone)
+export const formatDateTime = (iso) => dateTimeFormat.format(new Date(iso));
+
+// "just now", "5 minutes ago", "3 hours ago", "2 days ago", and the plain date after 30 days.
+// A time slightly in the future (a clock that is a little off) also reads "just now". now is a parameter for tests.
+export const timeAgo = (iso, now = Date.now()) => {
+  const elapsed = now - new Date(iso).getTime();
+  if (elapsed < MINUTE) return 'just now';
+  if (elapsed < HOUR) return relativeFormat.format(-Math.floor(elapsed / MINUTE), 'minute');
+  if (elapsed < DAY) return relativeFormat.format(-Math.floor(elapsed / HOUR), 'hour');
+  if (elapsed < RELATIVE_DAYS_LIMIT * DAY) return relativeFormat.format(-Math.floor(elapsed / DAY), 'day');
+  return formatDateTime(iso);
+};
+
+// True when a comment was changed more than a minute after it was written (so it shows "(edited)")
+export const wasEdited = (comment) => new Date(comment.updatedAt) - new Date(comment.createdAt) > MINUTE;

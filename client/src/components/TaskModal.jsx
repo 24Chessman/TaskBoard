@@ -16,6 +16,7 @@ import { formatDate, isOverdue, localDateKey, toDateKey } from '../utils/dates.j
 import Avatar from './Avatar.jsx';
 import Badge from './Badge.jsx';
 import Button from './Button.jsx';
+import CommentSection from './CommentSection.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
 import Input from './Input.jsx';
@@ -375,7 +376,7 @@ const TaskDetails = ({ task, project, canEdit, canDelete, onEdit, onDelete, onCl
         </div>
       )}
 
-      {/* M4.2 mounts the Comments section here: the comment list and add-comment form for this task. */}
+      <CommentSection projectId={project._id} taskId={task._id} />
 
       <div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 pt-4">
         {canDelete && (
