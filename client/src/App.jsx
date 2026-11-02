@@ -1,8 +1,9 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ProjectLayout from './components/ProjectLayout.jsx';
 import AdminRoute from './routes/AdminRoute.jsx';
 import GuestRoute from './routes/GuestRoute.jsx';
+import HomeRoute from './routes/HomeRoute.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -19,6 +20,9 @@ import ComponentDemo from './pages/ComponentDemo.jsx';
 
 const App = () => (
   <Routes>
+    {/* The public home: the landing page for guests, a redirect to /projects for signed-in users */}
+    <Route path="/" element={<HomeRoute />} />
+
     <Route element={<GuestRoute />}>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -32,7 +36,6 @@ const App = () => (
 
     <Route element={<ProtectedRoute />}>
       <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/projects" replace />} />
         <Route path="/projects" element={<ProjectList />} />
         <Route path="/projects/new" element={<ProjectCreate />} />
         <Route path="/projects/:projectId" element={<ProjectLayout />}>
