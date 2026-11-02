@@ -1,20 +1,21 @@
 // Activity page (/projects/:projectId/activity, a child of ProjectLayout). A timeline of what happened in the
-// project, newest first, grouped under day headings (Today, Yesterday, then dates). Each entry shows the actor's
-// avatar, their name in bold followed by the message (for example "Harshal moved 'Login page' to Review"), and the
-// relative time with the full date and time on hover. 20 entries per page; the page number lives in the URL.
+// project, newest first, grouped under day headings (Today, Yesterday, then dates) and drawn by
+// components/activity/ActivityTimeline.jsx (icon, actor name in bold plus message, relative time).
+// 20 entries per page; the page number lives in the URL.
 // Entries are written just after the action that causes them, so a Refresh button reloads the feed.
-// A deleted user shows as "Deleted user". All text is rendered as plain text.
+import { RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { listActivity } from '../api/activity.js';
-import Avatar from '../components/Avatar.jsx';
+import ActivityTimeline from '../components/activity/ActivityTimeline.jsx';
 import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Loader from '../components/Loader.jsx';
 import Pagination from '../components/Pagination.jsx';
+import PageHeader from '../components/shell/PageHeader.jsx';
 import useFetch from '../hooks/useFetch.js';
 import useProject from '../hooks/useProject.js';
-import { formatDateTime, groupByDay, timeAgo } from '../utils/dates.js';
+import { groupByDay } from '../utils/dates.js';
 
 const PAGE_SIZE = 20;
 
@@ -54,44 +55,36 @@ const Activity = () => {
 
     return (
       <>
-        <div className="space-y-6">
-          {groupByDay(data.data).map((group) => (
-            <section key={group.key} aria-labelledby={`day-${group.key}`}>
-              <h3 id={`day-${group.key}`} className="text-sm font-semibold text-slate-900">
-                {group.label}
-              </h3>
-              <ol className="mt-2 divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
-                {group.items.map((entry) => (
-                  <li key={entry._id} className="flex items-start gap-3 p-3">
-                    <Avatar user={entry.actor} />
-                    <div className="min-w-0 flex-1">
-                      <p className="break-words text-sm text-slate-900">
-                        <strong className="font-semibold">{entry.actor ? entry.actor.name : 'Deleted user'}</strong>{' '}
-                        {entry.message}
-                      </p>
-                      <time dateTime={entry.createdAt} title={formatDateTime(entry.createdAt)} className="text-xs text-slate-500">
-                        {timeAgo(entry.createdAt)}
-                      </time>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))}
+        <ActivityTimeline groups={groupByDay(data.data)} />
+        <div className="mt-6">
+          <Pagination page={data.page} totalPages={Math.ceil(data.total / data.limit)} onPageChange={goToPage} />
         </div>
-        <Pagination page={data.page} totalPages={Math.ceil(data.total / data.limit)} onPageChange={goToPage} />
       </>
     );
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-900">Activity</h2>
-        <Button variant="secondary" onClick={refetch} loading={loading && Boolean(data)} disabled={loading && !data}>
-          Refresh
-        </Button>
-      </div>
+    <div>
+      <PageHeader
+        breadcrumbs={[
+          { label: 'Projects', to: '/projects' },
+          { label: project.name, to: `/projects/${project._id}` },
+          { label: 'Activity' },
+        ]}
+        title="Activity"
+        description="What changed in this project, newest first."
+        actions={
+          <Button
+            variant="secondary"
+            leftIcon={RefreshCw}
+            onClick={refetch}
+            loading={loading && Boolean(data)}
+            disabled={loading && !data}
+          >
+            Refresh
+          </Button>
+        }
+      />
 
       {renderFeed()}
     </div>
