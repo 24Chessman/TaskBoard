@@ -7,6 +7,7 @@ import { RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { listActivity } from '../api/activity.js';
 import ActivityTimeline from '../components/activity/ActivityTimeline.jsx';
+import { NoActivityArt } from '../components/art/EmptyArt.jsx';
 import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
@@ -37,6 +38,7 @@ const Activity = () => {
     if (data.total === 0) {
       return (
         <EmptyState
+          art={<NoActivityArt />}
           title="No activity yet"
           message="Changes to tasks, members and comments will show up here."
         />

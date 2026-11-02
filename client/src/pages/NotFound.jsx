@@ -1,12 +1,26 @@
+// NotFound page: shown for any address that matches no route (404). Works for guests and signed-in users.
+import { Link } from 'react-router-dom';
+import { NotFoundArt } from '../components/art/EmptyArt.jsx';
+import EmptyState from '../components/EmptyState.jsx';
+import useAuth from '../hooks/useAuth.js';
+
 const NotFound = () => {
+  const { user } = useAuth();
+
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-semibold text-fg">NotFound</h1>
-      <p className="mt-2 text-sm text-slate-600">
-        Route: <code className="rounded bg-slate-100 px-1.5 py-0.5">*</code>
-      </p>
-      <p className="mt-1 text-sm text-slate-600">Module owner: Shared</p>
-    </section>
+    <EmptyState
+      headingAs="h1"
+      art={<NotFoundArt />}
+      title="We can't find that page"
+      message="The address may be mistyped, or the page may have moved."
+    >
+      <Link
+        to={user ? '/projects' : '/'}
+        className="mt-4 rounded-md px-3 py-2 text-sm font-medium text-brand-fg hover:text-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
+      >
+        {user ? 'Back to Projects' : 'Back to home'}
+      </Link>
+    </EmptyState>
   );
 };
 
