@@ -27,7 +27,7 @@ const Avatar = ({ user, size = 'sm', emptyLabel = 'Deleted user', className = ''
       role="img"
       aria-label={label}
       title={label}
-      className={`inline-flex shrink-0 select-none items-center justify-center rounded-full font-medium ${sizes[size] || sizes.sm} ${colorForName(user?.name)} ${className}`}
+      className={`inline-flex shrink-0 select-none items-center justify-center rounded-full font-medium ${sizes[size] || sizes.sm} ${colorForName(user?.name)} ${className}`} // unslop-ignore: avatars are full circles by design (docs/design.md section 5)
     >
       {user ? getInitials(user.name) : '?'}
     </span>

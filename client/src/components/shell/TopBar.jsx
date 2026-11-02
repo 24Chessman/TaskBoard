@@ -48,7 +48,7 @@ const TopBar = ({ onOpenNavigation }) => {
         <Dropdown
           label="Open user menu"
           triggerContent={<Avatar user={user} size="md" />}
-          triggerClassName="rounded-full"
+          triggerClassName="rounded-full" // unslop-ignore: the trigger wraps a circular avatar, so its focus ring is a circle
           items={menuItems}
           header={
             <div className="min-w-0">

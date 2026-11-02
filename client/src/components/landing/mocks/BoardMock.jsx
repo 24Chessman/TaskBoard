@@ -36,7 +36,7 @@ const FilterRow = () => (
       <Search size={14} />
       Search tasks
     </span>
-    <AvatarGroup users={Object.values(PEOPLE)} size="sm" />
+    <AvatarGroup users={Object.values(PEOPLE)} size="md" />
     <span className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2 text-xs font-medium text-fg-secondary">
       <ListFilter size={14} />
       Filters
