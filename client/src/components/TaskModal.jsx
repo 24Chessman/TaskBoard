@@ -1,4 +1,4 @@
-// TaskModal props: modal ({ mode: 'create' } to add a task, or { taskId } to open one), tasks (the board's current
+// TaskModal props: modal ({ mode: 'create', status } to add a task (status optional: the column it was started from), or { taskId } to open one), tasks (the board's current
 // task list: the modal shows the live copy of its task, so it updates after every refetch), project (with members
 // populated), isOwner (project owner or admin), onClose(), onChanged() (the board refetches).
 // One modal for the whole task life cycle, built on the shared Modal:
@@ -50,7 +50,7 @@ const personName = (user, fallback) => (user ? user.name : fallback);
 
 // ---------------------------------------------------------------- form (create and edit)
 
-const TaskForm = ({ project, task, onSaved, onCancel }) => {
+const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel }) => {
   const { showToast } = useToast();
   const members = project.members.filter((member) => member.user);
 
@@ -60,7 +60,7 @@ const TaskForm = ({ project, task, onSaved, onCancel }) => {
     priority: task?.priority || 'medium',
     assignee: task?.assignee?._id || '',
     dueDate: toDateKey(task?.dueDate),
-    status: 'todo',
+    status: defaultStatus || 'todo',
   });
   const [labels, setLabels] = useState(task?.labels || []);
   const [labelInput, setLabelInput] = useState('');
@@ -445,6 +445,7 @@ const TaskModal = ({ modal, tasks, project, isOwner, onClose, onChanged }) => {
           <TaskForm
             project={project}
             task={task}
+            defaultStatus={modal.status}
             onCancel={isCreate ? onClose : () => setEditing(false)}
             onSaved={() => {
               onChanged();

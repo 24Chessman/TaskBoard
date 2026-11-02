@@ -8,10 +8,10 @@ import { Plus } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { listTasks } from '../api/tasks.js';
 import BoardToolbar from '../components/board/BoardToolbar.jsx';
+import Column from '../components/board/Column.jsx';
 import { hasActiveFilters } from '../components/board/filters.js';
 import useBoardFilters from '../components/board/useBoardFilters.js';
 import Button from '../components/Button.jsx';
-import Column from '../components/Column.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Loader from '../components/Loader.jsx';
@@ -58,7 +58,7 @@ const Board = () => {
   const shown = data || lastData.current;
 
   const hasFilters = hasActiveFilters(filters);
-  const openCreate = () => setModal({ mode: 'create' });
+  const openCreate = (status) => setModal({ mode: 'create', status: typeof status === 'string' ? status : undefined });
   const openTask = (task) => setModal({ taskId: task._id });
 
   const renderBoard = () => {
@@ -78,7 +78,7 @@ const Board = () => {
           title="No tasks yet"
           message="Add the first task to start planning this project."
           actionLabel="Add task"
-          onAction={openCreate}
+          onAction={() => openCreate()}
         />
       );
     }
@@ -95,7 +95,16 @@ const Board = () => {
         )}
         <div className="flex gap-4 overflow-x-auto pb-4 lg:grid lg:grid-cols-4 lg:overflow-visible">
           {COLUMNS.map((column) => (
-            <Column key={column.id} id={column.id} title={column.title} tasks={byStatus[column.id]} onOpenTask={openTask} />
+            <Column
+              key={column.id}
+              id={column.id}
+              title={column.title}
+              tasks={byStatus[column.id]}
+              project={project}
+              onOpenTask={openTask}
+              onAddTask={openCreate}
+              onCreated={refetch}
+            />
           ))}
         </div>
       </>
@@ -112,7 +121,7 @@ const Board = () => {
         ]}
         title="Board"
         actions={
-          <Button leftIcon={Plus} onClick={openCreate}>
+          <Button leftIcon={Plus} onClick={() => openCreate()}>
             Add task
           </Button>
         }
