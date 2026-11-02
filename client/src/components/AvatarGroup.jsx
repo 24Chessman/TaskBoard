@@ -5,7 +5,7 @@
 import Avatar from './Avatar.jsx';
 
 // Overlap per size: just enough to read as a group, never enough to cover a neighbour's initials
-const overlaps = { xs: '-space-x-1', sm: '-space-x-1.5', md: '-space-x-1.5' };
+const overlaps = { xs: '-space-x-0.5', sm: '-space-x-1', md: '-space-x-1.5' };
 
 const overflowSizes = {
   xs: 'h-5 w-5 text-[10px]',
