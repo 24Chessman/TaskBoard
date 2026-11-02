@@ -16,6 +16,7 @@ import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Loader from '../components/Loader.jsx';
 import PageHeader from '../components/shell/PageHeader.jsx';
+import TaskDrawer from '../components/task/TaskDrawer.jsx';
 import TaskModal from '../components/TaskModal.jsx';
 import useFetch from '../hooks/useFetch.js';
 import useProject from '../hooks/useProject.js';
@@ -30,7 +31,7 @@ const COLUMNS = [
 
 const Board = () => {
   const { project, isOwner } = useProject();
-  // Which task modal is open: null, { mode: 'create' } or { taskId }
+  // What is open: null, { mode: 'create', status } (the create modal) or { taskId } (the task drawer)
   const [modal, setModal] = useState(null);
 
   const members = project.members.filter((member) => member.user);
@@ -142,10 +143,13 @@ const Board = () => {
 
       {renderBoard()}
 
-      {modal && (
-        <TaskModal
-          key={modal.taskId || 'new'}
-          modal={modal}
+      {modal?.mode === 'create' && (
+        <TaskModal modal={modal} project={project} onClose={() => setModal(null)} onChanged={refetch} />
+      )}
+      {modal?.taskId && (
+        <TaskDrawer
+          key={modal.taskId}
+          taskId={modal.taskId}
           tasks={shown?.data || []}
           project={project}
           isOwner={isOwner}

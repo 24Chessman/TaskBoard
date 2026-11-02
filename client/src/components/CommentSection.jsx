@@ -1,4 +1,5 @@
-// CommentSection props: projectId, taskId. The comments of one task, shown inside the task modal (view mode).
+// CommentSection props: projectId, taskId, onDirtyChange (optional: called with true while a comment being written
+// or edited has unsaved text, so the drawer can ask before closing). The comments of one task, shown inside the task modal (view mode).
 //   list    oldest first in a scrollable area: avatar, author, relative time (full date and time on hover),
 //           "(edited)" when changed more than a minute after posting. A deleted author shows as "Deleted user".
 //   add     a labelled textarea (max 1000 with a counter) and a Post button.
@@ -43,7 +44,7 @@ const stopEvent = (event) => {
   event.stopImmediatePropagation();
 };
 
-const CommentSection = ({ projectId, taskId }) => {
+const CommentSection = ({ projectId, taskId, onDirtyChange }) => {
   const headingId = useId();
   const { user } = useAuth();
   const { isOwner } = useProject();
@@ -72,6 +73,14 @@ const CommentSection = ({ projectId, taskId }) => {
   const editRef = useRef(null);
   const listRef = useRef(null);
   const scrollToEnd = useRef(false);
+
+  // Tell the parent whether there is unsaved text (a draft, or an edit that differs from the saved comment)
+  const editingOriginal = comments.find((comment) => comment._id === editingId)?.text;
+  const dirty = Boolean(draft.trim()) || (editingId !== null && editText !== editingOriginal);
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
   // After a new comment is added, scroll the list to it
   useEffect(() => {
