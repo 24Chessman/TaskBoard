@@ -47,20 +47,20 @@ const TaskCard = ({ task, onOpen }) => {
           <Badge key={label}>{label}</Badge>
         ))}
         {hiddenLabels > 0 && <Badge title={task.labels.slice(MAX_LABELS).join(', ')}>+{hiddenLabels}</Badge>}
+        {/* Without a due date the avatar joins the first row, so the card stays short */}
+        {!task.dueDate && <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" className="ml-auto" />}
       </span>
 
-      <span className="mt-2 flex items-center justify-between gap-2">
-        {task.dueDate ? (
+      {task.dueDate && (
+        <span className="mt-2 flex items-center justify-between gap-2">
           <span className={`inline-flex items-center gap-1 text-xs ${overdue ? 'font-medium text-danger-fg' : 'text-fg-secondary'}`}>
             {overdue ? <AlarmClock size={12} aria-hidden="true" /> : <Calendar size={12} aria-hidden="true" />}
             {overdue ? 'Overdue ' : ''}
             {formatDate(toDateKey(task.dueDate))}
           </span>
-        ) : (
-          <span />
-        )}
-        <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" />
-      </span>
+          <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" />
+        </span>
+      )}
     </button>
   );
 };

@@ -76,7 +76,7 @@ const QuickAdd = ({ project, status, columnTitle, onCreated }) => {
             placeholder="Task title, then Enter"
             autoComplete="off"
             value={title}
-            disabled={saving}
+            readOnly={saving}
             onChange={(event) => setTitle(event.target.value)}
             onBlur={() => !title.trim() && !saving && close(false)}
             error={error}

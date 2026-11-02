@@ -36,7 +36,7 @@ const BoardToolbar = ({ members, filters, searchText, onSearchText, labelText, o
         value={searchText}
         onChange={(event) => onSearchText(event.target.value)}
         placeholder="Search title or description"
-        className="min-w-0 flex-1 sm:max-w-xs"
+        className="min-w-0 basis-full sm:flex-1 sm:basis-auto sm:max-w-xs"
       />
 
       <div role="group" aria-label="Filter by assignee" className="flex items-center -space-x-1 px-1">
