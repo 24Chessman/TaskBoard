@@ -1,17 +1,17 @@
-// DetailsCard props: user, onUpdated (called with the saved user). Edit name and email (the PUT always needs both).
+// DetailsSection props: user, onUpdated (called with the saved user). Edit name and email (the PUT always needs both).
 // Validates on submit, shows server errors under the field (an email already in use is a field error), toast on success.
 import { useState } from 'react';
 import { updateUser } from '../../api/users.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import Button from '../Button.jsx';
-import Card from '../Card.jsx';
 import ErrorMessage from '../ErrorMessage.jsx';
 import Input from '../Input.jsx';
+import SettingsSection from '../settings/SettingsSection.jsx';
 import readServerError from './readServerError.js';
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
-const DetailsCard = ({ user, onUpdated }) => {
+const DetailsSection = ({ user, onUpdated }) => {
   const { showToast } = useToast();
   const [values, setValues] = useState({ name: user.name, email: user.email });
   const [fieldErrors, setFieldErrors] = useState({});
@@ -51,30 +51,25 @@ const DetailsCard = ({ user, onUpdated }) => {
   };
 
   return (
-    <section aria-labelledby="profile-details-title">
-      <Card className="p-6">
-        <h2 id="profile-details-title" className="mb-4 text-base font-semibold text-fg">
-          Account details
-        </h2>
-        <form onSubmit={handleSubmit} noValidate className="max-w-md space-y-4">
-          {formError && <ErrorMessage message={formError} />}
-          <Input label="Name" name="name" autoComplete="name" value={values.name} onChange={handleChange} error={fieldErrors.name} />
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={values.email}
-            onChange={handleChange}
-            error={fieldErrors.email}
-          />
-          <Button type="submit" loading={saving}>
-            Save changes
-          </Button>
-        </form>
-      </Card>
-    </section>
+    <SettingsSection from="lg" contentClassName="max-w-[30rem]" title="Account details" description="The name and email shown on your account.">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {formError && <ErrorMessage message={formError} />}
+              <Input label="Name" name="name" autoComplete="name" value={values.name} onChange={handleChange} error={fieldErrors.name} />
+              <Input
+                label="Email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={values.email}
+                onChange={handleChange}
+                error={fieldErrors.email}
+              />
+              <Button type="submit" loading={saving}>
+                Save changes
+              </Button>
+            </form>
+    </SettingsSection>
   );
 };
 
-export default DetailsCard;
+export default DetailsSection;

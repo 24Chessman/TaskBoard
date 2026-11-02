@@ -1,6 +1,6 @@
 # TaskBoard: Design Brief v2 (design.md)
 
-**Status:** Draft v0.3 (identity pass: cobalt, IBM Plex, product-first landing page, anti-slop rules), confirmed by the team lead
+**Status:** Draft v0.3.1 (identity pass: cobalt, IBM Plex, product-first landing page, anti-slop rules), confirmed by the team lead
 **Supersedes:** the visual parts of `ui_ux_brief.md` (palette, components, layout). The accessibility rules in `ui_ux_brief.md` section 7 still apply.
 **Stack limits:** React 18 + Tailwind v3. The ONLY new dependency allowed for the redesign is `lucide-react` (icons). No component libraries.
 
@@ -164,6 +164,7 @@ Sizes: 16px inside buttons and chips, 20px in the sidebar, 24px in empty states.
 - **Page header pattern:** breadcrumb (small, muted, with `ChevronRight` separators), then the page title with actions on the right (primary action as an icon + label button).
 - The old text tab row under the project title is removed (the sidebar replaces it). This also removes the stray scrollbar bug.
 - Page content max width `max-w-7xl`; the board may use the full width.
+- Every page has the same vertical rhythm: content (the breadcrumb included) starts `pt-6 sm:pt-8` below the top bar and ends with `pb-12`, so nothing touches the top bar or the bottom of the viewport.
 
 ## 7.1 Public landing page and routes (new in v0.2)
 
@@ -182,7 +183,7 @@ All "go to the app" links and the post-login and post-register redirects keep go
 **Public header** (sticky, `h-16`, white with bottom border once scrolled): Logo left; links "Product" and "Roles" (smooth-scroll anchors, optional) in the middle; on the right a quiet "Log in" link and a filled cobalt "Get started" button (to `/register`). Under 768px the links collapse into the same slide-over pattern as the app drawer.
 
 **Sections (top to bottom), v0.3, product-first**
-1. **Hero (left-aligned, not centred).** Left column, max about 520px: h1 "Plan the work. Move it across the board.", one supporting sentence, buttons "Get started free" (primary, `/register`) and "Log in" (secondary, `/login`), then one quiet line "Free for your team. No card needed." Right: a **large board mock** (three columns, five cards, real TaskCard look, fake generic data) that runs off the right edge of the viewport on desktop so it feels like a real app window. A thin window chrome (three dots is a cliché: use a small title row with the logo mark and the project name instead). No glow, no tilt, no blur. On mobile the mock sits under the buttons at full width, cropped on the right.
+1. **Hero (left-aligned, not centred).** Left column, max about 520px: h1 "Plan the work. Move it across the board.", one supporting sentence, buttons "Get started free" (primary, `/register`) and "Log in" (secondary, `/login`), then one quiet line "Free for your team. No card needed." Right: a **large board mock** (three columns, five cards, real TaskCard look, fake generic data) that runs off the right edge of the viewport on desktop so it feels like a real app window. A thin window chrome (three dots is a cliché: use a small title row with the logo mark and a plain example project name, "Launch week (example)", instead; the sample tasks stay consistent with it). No glow, no tilt, no blur. On mobile the mock sits under the buttons at full width, cropped on the right.
 2. **Four alternating feature rows** (text left or right, mock on the other side), each with an h2 that states an outcome, a short paragraph and two or three plain facts:
    - Board: "See every task in its column" (board mock with filters row).
    - Task drawer: "Everything about a task in one place" (details pane plus two comments).
@@ -190,7 +191,7 @@ All "go to the app" links and the post-login and post-register redirects keep go
    - Activity: "A history nobody has to write" (timeline mock).
    Dashboard charts get one line at the end of the section: "Dashboard charts are on the way." No separate card.
 3. **Closing section (quiet, not a coloured band).** On `bg-slate-50`: an h2 "Start your first board", one sentence, the primary button and a "Log in" link, with a small hand-drawn SVG (a card moving to the Done column) on the right.
-4. **Footer.** Logo, "A course project for IT645, DA-IICT", GitHub link with `ExternalLink` that states it opens in a new tab.
+4. **Footer.** Logo and a GitHub link with `ExternalLink` that states it opens in a new tab. Nothing else: no course or university text, no fake legal or social links.
 
 Removed from v0.2: the trust strip, the 3x2 feature-card grid, the three-step "How it works" and the coloured CTA band. Header anchor links become "Product" and "Roles" (or none if the page is short enough; the agent may drop anchors and keep only Log in and Get started).
 
@@ -218,6 +219,8 @@ Removed from v0.2: the trust strip, the 3x2 feature-card grid, the three-step "H
 | `EmptyState` | Large muted icon in a soft circle, title, one helpful sentence, one primary action |
 | `Dropdown menu` (new) | Small reusable menu used by the user menu: button, menu list, keyboard support (arrow keys, Esc), closes on outside click |
 | `Logo` (new) | See section 4 |
+
+Only one popover or dropdown menu is open at a time: opening one closes any other.
 
 Shared components must keep their existing prop names so existing screens keep working; new capabilities are added as optional props.
 
@@ -248,7 +251,7 @@ Shared components must keep their existing prop names so existing screens keep w
 
 **Auth pages (Login, Register).** On desktop a split layout: a left brand panel (solid cobalt `blue-700` background, Logo in white, one short tagline, and a faint hand-drawn SVG board outline as texture; no gradients) and the form on the right. On mobile only the form with the Logo above it.
 
-**Profile and Admin.** Profile: avatar header block, then two section cards. Admin: toolbar with search; table with Avatar + name, role lozenge, joined date, and icon buttons.
+**Profile and Admin.** Profile: avatar header block, then sections laid out like Settings (title and description on the left, the form on the right from `lg` up) so the page fills its width. Admin: toolbar with search; table with Avatar + name, role lozenge, joined date, and icon buttons.
 
 ## 10. Accessibility and quality bar
 

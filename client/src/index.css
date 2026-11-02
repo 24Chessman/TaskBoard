@@ -55,6 +55,21 @@
     line-height: 1.25rem;
   }
 
+  /* Native date inputs look like the other fields: same box (FieldParts), light colour scheme, and a calmer slate
+     calendar icon that darkens on hover. They stay native: typing and the browser picker work as before. */
+  input[type="date"] {
+    color-scheme: light;
+    height: 2.125rem;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+    border-radius: 0.25rem;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
   /* Visible keyboard focus everywhere; components with their own ring override it */
   :focus-visible {
     outline: 2px solid rgb(var(--color-brand-ring));

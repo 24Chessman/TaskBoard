@@ -1,4 +1,4 @@
-// PublicFooter (no props): the logo, a one-line note about the project and a link to the GitHub repository.
+// PublicFooter (no props): the logo and a link to the GitHub repository.
 // The link opens in a new tab, so its accessible name says so. No social icons, no legal pages.
 import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,6 @@ const PublicFooter = () => (
       >
         <Logo size={24} />
       </Link>
-      <p className="text-sm text-fg-secondary">A course project for IT645, DA-IICT</p>
       <a
         href="https://github.com/24Chessman/TaskBoard"
         target="_blank"

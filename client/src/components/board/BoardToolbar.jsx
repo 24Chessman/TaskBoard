@@ -39,7 +39,7 @@ const BoardToolbar = ({ members, filters, searchText, onSearchText, labelText, o
         className="min-w-0 basis-full sm:flex-1 sm:basis-auto sm:max-w-xs"
       />
 
-      <div role="group" aria-label="Filter by assignee" className="flex items-center -space-x-1 px-1">
+      <div role="group" aria-label="Filter by assignee" className="flex items-center -space-x-0.5 px-1">
         {members.map((member) => (
           <AssigneeToggle
             key={member.user._id}
