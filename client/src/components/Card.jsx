@@ -3,7 +3,7 @@
 // rounded-lg corners. Do not put a Card inside another Card.
 const Card = ({ children, className = '', hoverable = false, ...rest }) => (
   <div
-    className={`rounded-lg border border-line bg-surface p-4 shadow-sm ${hoverable ? 'transition-shadow hover:shadow-md' : ''} ${className}`}
+    className={`rounded-lg border border-line bg-surface p-4 ${hoverable ? 'transition-colors hover:border-fg-muted hover:shadow-sm' : ''} ${className}`}
     {...rest}
   >
     {children}

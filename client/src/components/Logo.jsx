@@ -5,8 +5,8 @@
 // With the wordmark the SVG is hidden from screen readers (the text is the name). Icon-only, the SVG has the name
 // "TaskBoard" itself, so a link that wraps the Logo always has an accessible name. The Logo is not a link.
 const tones = {
-  default: { square: 'fill-indigo-600', bars: 'fill-white', text: 'text-slate-900' },
-  light: { square: 'fill-white', bars: 'fill-indigo-600', text: 'text-white' },
+  default: { square: 'fill-brand', bars: 'fill-white', text: 'text-slate-900' },
+  light: { square: 'fill-white', bars: 'fill-brand', text: 'text-white' },
 };
 
 const Logo = ({ showWordmark = true, size = 28, tone = 'default', className = '' }) => {

@@ -10,7 +10,7 @@ const FinalCta = () => (
         <h2 id="cta-title" className="text-3xl font-semibold tracking-tight text-white">
           Ready to plan your next project?
         </h2>
-        <p className="mt-2 text-lg text-indigo-100">Create an account and set up your first board in a minute.</p>
+        <p className="mt-2 text-lg text-white/90">Create an account and set up your first board in a minute.</p>
       </div>
       <div className="flex flex-wrap items-center gap-5">
         <LinkButton to="/register" variant="inverse" icon={ArrowRight}>

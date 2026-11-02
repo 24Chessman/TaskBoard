@@ -10,7 +10,7 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          'Inter',
+          '"IBM Plex Sans"',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',
@@ -20,6 +20,8 @@ export default {
           'Arial',
           'sans-serif',
         ],
+        // Mono only for identifiers and counters (character counters, sample ids in the landing mocks)
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
       colors: {
         app: role('app'),
@@ -42,8 +44,9 @@ export default {
         neutral: { soft: role('neutral-soft'), fg: role('neutral-fg') },
       },
       // Radius and shadow use Tailwind's own scales, which already match the brief:
-      // rounded-md 6px (inputs, buttons), rounded-lg 8px (cards), rounded-xl 12px (columns, drawer, modal);
-      // shadow-sm cards, shadow-md card hover, shadow-xl drawer and modal.
+      // rounded 4px (lozenges), rounded-md 6px (inputs, buttons, logo mark), rounded-lg 8px (cards, board columns),
+      // rounded-xl 12px (drawers, modals, popovers), full (avatars). No shadow at rest on cards; shadow-sm on hover,
+      // shadow-lg popovers, shadow-xl drawer and modal.
       keyframes: {
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
         'fade-rise': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },

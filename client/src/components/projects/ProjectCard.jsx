@@ -15,7 +15,7 @@ const ProjectCard = ({ project }) => {
     <Link
       to={`/projects/${project._id}`}
       aria-label={`${project.name}, ${statusLabel}`}
-      className="flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-4 shadow-sm transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2 active:bg-surface-muted"
+      className="flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-4 transition-colors hover:border-fg-muted hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2 active:bg-surface-muted"
     >
       <div className="flex items-start gap-3" aria-hidden="true">
         <ProjectAvatar name={project.name} size="md" />

@@ -6,7 +6,7 @@ import { getInitials } from './Avatar.jsx';
 const sizes = {
   sm: 'h-8 w-8 rounded-md text-xs',
   md: 'h-10 w-10 rounded-lg text-sm',
-  lg: 'h-14 w-14 rounded-xl text-lg',
+  lg: 'h-14 w-14 rounded-lg text-lg',
 };
 
 const ProjectAvatar = ({ name, size = 'md', className = '' }) => (
