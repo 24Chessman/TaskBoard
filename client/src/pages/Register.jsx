@@ -2,9 +2,10 @@
 // calls useAuth().register and goes to /projects. Server errors ({ field, message }) are shown under the
 // matching field; a duplicate email (409) is shown under the email field.
 import { useState } from 'react';
+import { Lock, Mail, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../components/auth/AuthLayout.jsx';
 import Button from '../components/Button.jsx';
-import Card from '../components/Card.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
 import useAuth from '../hooks/useAuth.js';
@@ -69,57 +70,53 @@ const Register = () => {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8 font-sans text-slate-900">
-      <div className="w-full max-w-md">
-        <p className="mb-6 text-center text-xl font-bold">TaskBoard</p>
-        <Card className="p-6">
-          <h1 className="text-2xl font-semibold">Create your account</h1>
+    <AuthLayout>
+      <h1 className="text-2xl font-semibold tracking-tight text-fg">Create your account</h1>
+      <p className="mt-1 text-sm text-fg-secondary">It takes a minute. No card needed.</p>
 
-          <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
-            {formError && <ErrorMessage message={formError} />}
-            <Input
-              label="Name"
-              name="name"
-              autoComplete="name"
-              value={values.name}
-              onChange={handleChange}
-              error={fieldErrors.name}
-            />
-            <Input
-              label="Email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={values.email}
-              onChange={handleChange}
-              error={fieldErrors.email}
-            />
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              value={values.password}
-              onChange={handleChange}
-              error={fieldErrors.password}
-            />
-            <Button type="submit" loading={submitting} className="w-full">
-              Create account
-            </Button>
-          </form>
+      <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+        {formError && <ErrorMessage message={formError} />}
+        <Input
+          label="Name"
+          name="name"
+          autoComplete="name"
+          leadingIcon={User}
+          value={values.name}
+          onChange={handleChange}
+          error={fieldErrors.name}
+        />
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          leadingIcon={Mail}
+          value={values.email}
+          onChange={handleChange}
+          error={fieldErrors.email}
+        />
+        <Input
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          leadingIcon={Lock}
+          value={values.password}
+          onChange={handleChange}
+          error={fieldErrors.password}
+        />
+        <Button type="submit" loading={submitting} className="w-full">
+          Create account
+        </Button>
+      </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
-            Already have an account?{' '}
-            <Link
-              to="/login"
-              className="font-medium text-indigo-600 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-            >
-              Log in
-            </Link>
-          </p>
-        </Card>
-      </div>
-    </main>
+      <p className="mt-6 text-sm text-fg-secondary">
+        Already have an account?{' '}
+        <Link to="/login" className="font-medium text-brand-fg underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring">
+          Log in
+        </Link>
+      </p>
+    </AuthLayout>
   );
 };
 
