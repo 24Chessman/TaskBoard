@@ -5,8 +5,9 @@
 // className (wrapper). A button that opens a menu.
 // Keyboard: Enter / Space / ArrowDown open it (ArrowUp opens on the last item); Arrow keys, Home and End move
 // between items (wrapping); Enter or Space picks one; Esc closes and returns focus to the button; Tab closes.
-// Clicking outside closes it. Esc closes only the top overlay (utils/layers.js).
+// Clicking outside closes it. Only one Dropdown or Popover is open at a time (hooks/useExclusiveMenu.js). Esc closes only the top overlay (utils/layers.js).
 import { useEffect, useId, useRef, useState } from 'react';
+import useExclusiveMenu from '../hooks/useExclusiveMenu.js';
 import useLayer from '../hooks/useLayer.js';
 import { isTopLayer } from '../utils/layers.js';
 
@@ -21,6 +22,7 @@ const Dropdown = ({ label, triggerContent, triggerClassName = '', items = [], he
   const startAt = useRef('first');
   const menuId = useId();
   const layerId = useLayer(open);
+  useExclusiveMenu(open, () => setOpen(false)); // opening another menu closes this one (no focus move)
 
   const enabledItems = () => Array.from(menuRef.current?.querySelectorAll('[role="menuitem"]:not(:disabled)') || []);
 

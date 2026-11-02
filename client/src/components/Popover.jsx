@@ -3,8 +3,10 @@
 // panelClassName, className (wrapper). A button that opens a small panel.
 // Esc closes only the Popover when it is the top layer (utils/layers.js) and focus returns to the button; a click
 // outside closes it (focus stays where the click went); the button has aria-expanded and aria-controls.
+// Only one Popover or Dropdown is open at a time (hooks/useExclusiveMenu.js).
 // Unlike Dropdown it is not a menu: Tab moves through the controls inside it, and Tab out of the panel closes it.
 import { useEffect, useId, useRef, useState } from 'react';
+import useExclusiveMenu from '../hooks/useExclusiveMenu.js';
 import useLayer from '../hooks/useLayer.js';
 import { isTopLayer } from '../utils/layers.js';
 
@@ -15,6 +17,7 @@ const Popover = ({ label, triggerContent, triggerClassName = '', children, align
   const panelRef = useRef(null);
   const panelId = useId();
   const layerId = useLayer(open);
+  useExclusiveMenu(open, () => setOpen(false)); // opening another menu closes this one (no focus move)
 
   // Move focus into the panel when it opens
   useEffect(() => {
