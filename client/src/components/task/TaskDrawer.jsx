@@ -13,7 +13,7 @@ import { deleteTask } from '../../api/tasks.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import useAuth from '../../hooks/useAuth.js';
 import Button from '../Button.jsx';
-import CommentSection from '../CommentSection.jsx';
+import CommentSection from './comments/CommentSection.jsx';
 import ConfirmDialog from '../ConfirmDialog.jsx';
 import Drawer from '../Drawer.jsx';
 import Dropdown from '../Dropdown.jsx';
