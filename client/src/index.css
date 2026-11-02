@@ -13,11 +13,11 @@
     --color-fg-secondary: 71 85 105; /* slate-600 */
     --color-fg-muted: 100 116 139; /* slate-500 */
 
-    --color-brand: 79 70 229; /* indigo-600 */
-    --color-brand-hover: 67 56 202; /* indigo-700 */
-    --color-brand-soft: 238 242 255; /* indigo-50 */
-    --color-brand-fg: 67 56 202; /* indigo-700 */
-    --color-brand-ring: 99 102 241; /* indigo-500 */
+    --color-brand: 29 78 216; /* blue-700 #1D4ED8, 6.7:1 with white text */
+    --color-brand-hover: 30 64 175; /* blue-800 */
+    --color-brand-soft: 239 246 255; /* blue-50 */
+    --color-brand-fg: 29 78 216; /* blue-700 */
+    --color-brand-ring: 37 99 235; /* blue-600 */
 
     --color-danger: 220 38 38; /* red-600 */
     --color-danger-hover: 185 28 28; /* red-700 */
@@ -35,6 +35,11 @@
     --color-info-fg: 3 105 161; /* sky-700 */
     --color-neutral-soft: 241 245 249; /* slate-100 */
     --color-neutral-fg: 51 65 85; /* slate-700 */
+  }
+
+  /* Numbers in tables line up */
+  table {
+    font-variant-numeric: tabular-nums;
   }
 
   /* The page never scrolls sideways (clip, unlike hidden, keeps sticky headers working) */

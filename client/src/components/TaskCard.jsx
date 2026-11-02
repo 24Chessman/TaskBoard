@@ -20,7 +20,7 @@ const TaskCard = ({ task, onOpen }) => {
     <button
       type="button"
       onClick={() => onOpen(task)}
-      className="block w-full rounded-lg border border-slate-200 bg-white p-3 text-left shadow-sm transition-colors hover:border-indigo-300 hover:bg-slate-50 active:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+      className="block w-full rounded-lg border border-slate-200 bg-white p-3 text-left transition-colors hover:border-fg-muted hover:bg-slate-50 hover:shadow-sm active:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span className="block break-words text-sm font-medium text-slate-900">{task.title}</span>
 

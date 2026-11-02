@@ -1,6 +1,6 @@
 # TaskBoard: Design Brief v2 (design.md)
 
-**Status:** Draft v0.2 (adds the public landing page and findings from the live study of Jira, the Atlassian Design System and two Jira clones), awaiting team confirmation
+**Status:** Draft v0.3 (identity pass: cobalt, IBM Plex, product-first landing page, anti-slop rules), confirmed by the team lead
 **Supersedes:** the visual parts of `ui_ux_brief.md` (palette, components, layout). The accessibility rules in `ui_ux_brief.md` section 7 still apply.
 **Stack limits:** React 18 + Tailwind v3. The ONLY new dependency allowed for the redesign is `lucide-react` (icons). No component libraries.
 
@@ -28,6 +28,8 @@ We study how established tools organise work, and borrow **patterns and ideas on
 | Trello | Very light, scannable cards; coloured label chips; "Add a card" inline at the bottom of a list; badges with small icons (due date, comments) |
 | Linear | Dense, calm interface with one accent colour; small consistent icons; status and priority drawn as icons, not words; subtle borders instead of heavy shadows; fast, short transitions |
 | Asana | Friendly empty states with an icon and a clear call to action; soft colour use |
+| Notion | Calm, spacious pages; product shown in context rather than described; restrained colour; hand-made feeling spot illustrations instead of stock art |
+| Trello (public site) | Very large product visuals right in the hero; simple headline with one clear action; alternating text and product rows below |
 
 Where a reference conflicts with accessibility or with our rules, ours wins (for example, we use sentence-case column titles, not tracked capitals).
 
@@ -61,14 +63,14 @@ Sources: atlassian.com/software/jira (viewed in a browser), the Atlassian Design
 ## 3. Design principles
 
 1. **Icons for actions, words for meaning.** Common actions get an icon (with an accessible name and a tooltip). Anything unusual keeps a text label.
-2. **One accent.** Indigo is the only brand colour. Status and priority colours are semantic and small.
+2. **One accent.** Cobalt is the only brand colour. Status and priority colours are semantic and small.
 3. **Dense but calm.** 14px UI text, 4px spacing grid, thin borders, restrained shadows.
 4. **Always oriented.** A persistent sidebar and a breadcrumb tell the user where they are.
 5. **Everything has a state.** Hover, focus, active, disabled, loading, empty and error.
 
 ## 4. Brand
 
-**Logo (original, drawn as inline SVG):** a rounded indigo square (`indigo-600`) containing three white rounded vertical bars of different heights, like kanban columns. The wordmark "TaskBoard" sits beside it in Inter semibold, `slate-900`.
+**Logo (original, drawn as inline SVG):** a cobalt square (`#1D4ED8`, corner radius 6 on a 32px mark) that contains two thin white column outlines and one small solid white card sitting across the gap between them, slightly offset, so it reads as "a task moving to the next column". It must not look like a generic three-bar icon. The wordmark "TaskBoard" sits beside it in IBM Plex Sans semibold, `slate-900`.
 
 - Component: `components/Logo.jsx` with props `showWordmark` (default true) and `size`.
 - Favicon: `client/public/favicon.svg` using the same mark. Add it to `index.html`.
@@ -82,21 +84,43 @@ Sources: atlassian.com/software/jira (viewed in a browser), the Atlassian Design
 |------|---------|
 | App background | `bg-slate-50` |
 | Surface (cards, panels, top bar) | `bg-white`, border `border-slate-200` |
-| Sidebar | `bg-white`, right border; active item `bg-indigo-50 text-indigo-700`, hover `bg-slate-100` |
-| Board column | `bg-slate-100/70` with `rounded-xl` |
+| Sidebar | `bg-white`, right border; active item `bg-blue-50 text-blue-700`, hover `bg-slate-100` |
+| Board column | `bg-slate-100/70` with `rounded-lg` |
 | Text | `text-slate-900` (main), `text-slate-600` (secondary), `text-slate-500` (muted) |
-| Primary | `indigo-600`, hover `indigo-700`, focus ring `ring-indigo-500` |
+| Primary (cobalt) | `blue-700` (`#1D4ED8`, 6.7:1 with white text), hover `blue-800`, focus ring `ring-blue-600`; selected and link text `blue-700` |
 | Danger / success / warning | `red-600`, `emerald-600`, `amber-500` |
 
 **Lozenges** (status and priority): `rounded-md px-2 py-0.5 text-xs font-medium` with a soft background, matching text and inset ring, for example `bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20`.
 
-**Typography:** Inter. Base UI text `text-sm` (14px). Page title `text-xl font-semibold`. Section title `text-base font-semibold`. Meta text `text-xs text-slate-500`. No tracked capitals and no all-caps eyebrows.
+**Typography:** IBM Plex Sans (400, 500, 600) with IBM Plex Mono (400, 500) for identifiers and counters only (character counters, sample ids in mock UI); both from Google Fonts with `display=swap` and a system-font fallback stack. Reason: a tool for engineers, a clear and slightly technical voice, and it is not the default sans. Base UI text `text-sm` (14px). Page title `text-xl font-semibold`. Section title `text-base font-semibold`. Meta text `text-xs text-slate-500`. No tracked capitals and no all-caps eyebrows.
 
-**Shape and depth:** inputs and buttons `rounded-md`, cards `rounded-lg`, drawers and modals `rounded-xl`. Shadows: cards `shadow-sm`, card hover `shadow-md`, drawer and modal `shadow-xl`.
+**Shape and depth (a deliberate scale, not one radius everywhere):** lozenges `rounded` (4px); inputs, buttons and the logo mark `rounded-md` (6px); cards and board columns `rounded-lg` (8px); drawers, modals and popovers `rounded-xl` (12px); avatars full. Prefer 1px borders over shadows: cards have no shadow at rest, hover darkens the border and adds `shadow-sm`; popovers `shadow-lg`; drawers and modals `shadow-xl`.
 
 **Spacing:** 4px grid. Page padding `px-4 sm:px-6 lg:px-8`, card padding `p-4`, stack gaps `gap-3` or `gap-4`.
 
 **Motion:** 150ms ease-out for hover and colour changes; drawer slide 200ms; toasts fade and slide 150ms. Respect `prefers-reduced-motion` (no slide, instant fade).
+
+## 5.1 Anti-slop rules (v0.3)
+
+These come from community research on AI-looking UI. A "tell" is an unspecified default, so every choice below has a stated reason.
+
+Decisions made on purpose:
+- **Reference:** Jira and the Atlassian token scale for the app screens; Notion and Trello public pages for the landing page's calm, product-first feel.
+- **Colour:** cobalt `#1D4ED8`. Not indigo or violet (the "AI purple" default) and not cream, serif and sage green (the newer default).
+- **Type:** IBM Plex Sans and Plex Mono, chosen for a tool-like voice.
+- **Landing layout:** product-first, left-aligned, no "hero + three cards + coloured CTA band" skeleton.
+
+Never do:
+- Gradients, gradient text, glow or blurred colour orbs, glassmorphism.
+- `hover:scale-*` on cards, fade-up on every section, any decorative animation. Motion only for state changes (drawer, dropdown, toast) and the one hero entrance.
+- One radius everywhere (see the scale above) and pill buttons.
+- Emoji as icons; stock illustrations; fake logos, quotes, counts or awards.
+- Copy clichés: "Transform", "Supercharge", "Unleash", "Seamless", "Elevate", "All-in-one", "Revolutionize".
+- Untouched library defaults: every colour, radius and font comes from the roles in section 5.
+
+Allowed only with a reason written next to it in the code (`unslop-ignore` comment): anything the auditor flags that is a deliberate choice.
+
+Illustrations and images: hand-authored inline SVG only (original, flat, line plus one fill, two hues from the palette plus neutrals, `aria-hidden`). No raster stock photos. Mock UI on the landing page is built from the real shared components with fake sample data, so it is honest and stays in sync.
 
 ## 6. Icons (lucide-react)
 
@@ -130,7 +154,7 @@ Sizes: 16px inside buttons and chips, 20px in the sidebar, 24px in empty states.
 | GitHub link (M4.5) | `Github`, `ExternalLink` |
 
 **Priority icons:** high `ArrowUp` (`text-red-600`), medium `Equal` (`text-amber-500`), low `ArrowDown` (`text-sky-600`). Always shown with a tooltip and an accessible text name.
-**Status icons:** To Do `Circle` (slate), In Progress `CircleDot` (indigo), Review `Eye` (amber), Done `CheckCircle2` (emerald).
+**Status icons:** To Do `Circle` (slate), In Progress `CircleDot` (cobalt), Review `Eye` (amber), Done `CheckCircle2` (emerald).
 
 ## 7. App shell
 
@@ -155,24 +179,27 @@ Visitors who are not logged in must see a landing page first, not the login form
 
 All "go to the app" links and the post-login and post-register redirects keep going to `/projects`. The 401 interceptor still redirects to `/login?reason=expired`. The Logo in the app top bar links to `/projects`; the Logo on public pages links to `/`.
 
-**Public header** (sticky, `h-16`, white with bottom border once scrolled): Logo left; links "Features" and "How it works" (smooth-scroll anchors) in the middle; on the right a quiet "Log in" link and a filled indigo "Get started" button (to `/register`). Under 768px the links collapse into the same slide-over pattern as the app drawer.
+**Public header** (sticky, `h-16`, white with bottom border once scrolled): Logo left; links "Product" and "Roles" (smooth-scroll anchors, optional) in the middle; on the right a quiet "Log in" link and a filled cobalt "Get started" button (to `/register`). Under 768px the links collapse into the same slide-over pattern as the app drawer.
 
-**Sections (top to bottom)**
-1. **Hero.** Two columns on desktop. Left: headline "Plan the work. Move it across the board." (placeholder, team may reword), one supporting sentence, buttons "Get started free" (primary, `/register`) and "Log in" (secondary, `/login`). Under the buttons a small line: "Free for your team. No card needed." Right: a **product preview built in HTML and Tailwind** (not an image): a mock board with three columns and four cards using the real TaskCard look, slightly tilted or cropped by the section edge, with a soft indigo glow behind it. It uses fake sample data only.
-2. **Trust strip.** One row with three short facts, no fake customer logos: "Kanban boards", "Roles and permissions", "Activity history".
-3. **Features.** Six cards in a 3x2 grid, each with a lucide icon, a title and one sentence: Kanban boards, Tasks with labels and due dates, Team roles (Owner, Member, Admin), Comments on every task, Activity feed, Dashboard charts. (The dashboard card says "coming soon" until M4.4 ships.)
-4. **How it works.** Three numbered steps: Create a project, Invite your team, Move tasks to Done. Each with a small icon.
-5. **Big preview or showcase.** Optional wide section with a second mock (task drawer with comments) to show depth. Skip it if the page feels long.
-6. **Final call to action.** An indigo-600 band with a short heading, the primary button in white and a "Log in" link.
-7. **Footer.** Logo, "A project for IT645, DA-IICT", and a link to the GitHub repository. No fake social icons or legal pages.
+**Sections (top to bottom), v0.3, product-first**
+1. **Hero (left-aligned, not centred).** Left column, max about 520px: h1 "Plan the work. Move it across the board.", one supporting sentence, buttons "Get started free" (primary, `/register`) and "Log in" (secondary, `/login`), then one quiet line "Free for your team. No card needed." Right: a **large board mock** (three columns, five cards, real TaskCard look, fake generic data) that runs off the right edge of the viewport on desktop so it feels like a real app window. A thin window chrome (three dots is a cliché: use a small title row with the logo mark and the project name instead). No glow, no tilt, no blur. On mobile the mock sits under the buttons at full width, cropped on the right.
+2. **Four alternating feature rows** (text left or right, mock on the other side), each with an h2 that states an outcome, a short paragraph and two or three plain facts:
+   - Board: "See every task in its column" (board mock with filters row).
+   - Task drawer: "Everything about a task in one place" (details pane plus two comments).
+   - Roles: "Owners decide, members do" (a small roles table: Admin, Owner, Member, with what each can do).
+   - Activity: "A history nobody has to write" (timeline mock).
+   Dashboard charts get one line at the end of the section: "Dashboard charts are on the way." No separate card.
+3. **Closing section (quiet, not a coloured band).** On `bg-slate-50`: an h2 "Start your first board", one sentence, the primary button and a "Log in" link, with a small hand-drawn SVG (a card moving to the Done column) on the right.
+4. **Footer.** Logo, "A course project for IT645, DA-IICT", GitHub link with `ExternalLink` that states it opens in a new tab.
+
+Removed from v0.2: the trust strip, the 3x2 feature-card grid, the three-step "How it works" and the coloured CTA band. Header anchor links become "Product" and "Roles" (or none if the page is short enough; the agent may drop anchors and keep only Log in and Get started).
 
 **Rules for the landing page**
-- Honest content only: no invented testimonials, user counts, company logos or awards. Sample data in mock cards is clearly generic.
-- Same tokens, icons and Inter font as the app. One accent. Generous space (sections `py-16 sm:py-24`), text `max-w-2xl` for readability, headings `text-4xl sm:text-5xl font-semibold tracking-tight` (tight tracking is fine, tracked capitals still are not).
-- No external images, stock photos or illustration libraries. Everything is SVG, CSS or lucide.
-- Subtle entrance motion only (fade and 8px rise, 200ms), disabled for `prefers-reduced-motion`. No parallax, no autoplay carousels, no animated counters.
-- Performance: no new dependency; the page is a normal route in the same bundle. Lighthouse target of 90+ for Accessibility and Best Practices; tell the agent to run it only if it is already available.
-- SEO basics in `index.html`: `<title>`, meta description and theme colour.
+- Honest content only: no invented testimonials, user counts, customer logos or awards. Every mock uses generic sample data and is `aria-hidden`; the same information is stated in text next to it.
+- Same tokens, icons and fonts as the app. Sections `py-16 sm:py-24`, text `max-w-prose`. Headings `text-4xl sm:text-5xl font-semibold` (hero) and `text-2xl sm:text-3xl font-semibold` (rows) with tracking `-0.02em` at most; no tracked capitals.
+- Only the hero has an entrance animation (fade and 8px rise, 200ms), off under `prefers-reduced-motion`. Nothing else moves.
+- No raster images, no external images. SVG is hand-authored and inline.
+- SEO basics in `index.html`: `<title>`, meta description, theme colour `#1D4ED8`, Open Graph text.
 
 **Login and Register after the change.** Keep the split layout from section 9. Add a small "Back to home" link and make the Logo link to `/`.
 
@@ -219,7 +246,7 @@ Shared components must keep their existing prop names so existing screens keep w
 
 **Settings.** Two-column sections on desktop: section title and description on the left, the form on the right, divided by thin lines. Danger zone is a separate bordered section with a red heading.
 
-**Auth pages (Login, Register).** On desktop a split layout: a left brand panel (indigo-600 background, Logo in white, one short tagline, no stock gradients) and the form on the right. On mobile only the form with the Logo above it.
+**Auth pages (Login, Register).** On desktop a split layout: a left brand panel (solid cobalt `blue-700` background, Logo in white, one short tagline, and a faint hand-drawn SVG board outline as texture; no gradients) and the form on the right. On mobile only the form with the Logo above it.
 
 **Profile and Admin.** Profile: avatar header block, then two section cards. Admin: toolbar with search; table with Avatar + name, role lozenge, joined date, and icon buttons.
 
@@ -233,15 +260,14 @@ Shared components must keep their existing prop names so existing screens keep w
 
 ## 11. Out of scope for the refresh
 
-Dark mode, issue keys (like `TB-12`), drag-and-drop (still optional M5.4), a global command palette, custom fonts beyond Inter, animations beyond the short transitions above, illustrations beyond simple icon-based empty states.
+Dark mode, issue keys (like `TB-12`), drag-and-drop (still optional M5.4), a global command palette, fonts beyond IBM Plex Sans and Mono, animations beyond the short transitions above, illustrations beyond the few hand-authored SVGs named in sections 5.1 and 7.1 (landing page, empty states, auth panel).
 
-## 12. Implementation order (four prompts)
+## 12. Implementation order
 
-The landing page comes right after the foundation so the public site and the app share the same components from the start.
+Done: foundation (M4.7a), landing page v1 and auth pages (M4.7b), app shell and page restyle (M4.7c).
 
-1. **Foundation:** install `lucide-react`; Logo, favicon; token cleanup in Tailwind config; refresh of shared components (Button, IconButton, Input, Badge and lozenges, Avatar and AvatarGroup, ProjectAvatar, Card, Drawer, Toast, EmptyState, Dropdown); update the component demo page.
-2. **Landing page and public routes:** `LandingPage`, public header and footer, route changes from section 7.1, the mock board preview, `index.html` metadata; restyle Login and Register with the split layout.
-3. **App shell and pages:** top bar, sidebar, mobile drawer, breadcrumb and page header; restyle Projects list and create, Project settings, Profile, Admin users and Activity.
-4. **Board and task drawer:** new toolbar, columns, cards, quick add, task drawer, comments row styling.
+Next:
+4. **Identity pass (M4.7d):** install check for Playwright MCP and unslop-ui; baseline audit and screenshots; switch to cobalt and IBM Plex through the existing role tokens; new logo and favicon; rebuild the landing page per section 7.1 (v0.3); auth panel texture; empty-state SVG art; re-audit and screenshot loop at 1440px and 390px.
+5. **Board and task drawer (M4.7e):** new toolbar, columns, cards, quick add, task drawer, comments row styling.
 
 The dashboard (M4.4) and the GitHub issue lookup (M4.5) are built after this, using the new components.

@@ -2,9 +2,10 @@
 // Search text, status filter and page number live in the URL query string (?search=&status=&page=),
 // so the Back button and shared links keep the filters. Uses useFetch for loading, error and empty states.
 import { useEffect, useState } from 'react';
-import { FolderKanban, Plus, Search, SearchX } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listProjects } from '../api/projects.js';
+import { NoProjectsArt, NoResultsArt } from '../components/art/EmptyArt.jsx';
 import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
@@ -67,7 +68,7 @@ const ProjectList = () => {
     if (data.data.length === 0) {
       return hasFilters ? (
         <EmptyState
-          icon={SearchX}
+          art={<NoResultsArt />}
           title="No projects match your filters"
           message="Try a different search or status."
           actionLabel="Clear filters"
@@ -75,7 +76,7 @@ const ProjectList = () => {
         />
       ) : (
         <EmptyState
-          icon={FolderKanban}
+          art={<NoProjectsArt />}
           title="No projects yet"
           message="Create your first project to start organising tasks."
           actionLabel="Create project"

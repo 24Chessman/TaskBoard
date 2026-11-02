@@ -187,7 +187,7 @@ const TaskForm = ({ project, task, onSaved, onCancel }) => {
           onChange={handleChange}
           error={fieldErrors.description}
         />
-        <p className={`mt-1 text-right text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-red-600' : 'text-slate-500'}`}>
+        <p className={`mt-1 text-right font-mono text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-danger' : 'text-fg-secondary'}`}>
           {values.description.length}/{DESCRIPTION_MAX}
         </p>
       </div>
@@ -236,14 +236,14 @@ const TaskForm = ({ project, task, onSaved, onCancel }) => {
             {labels.map((label) => (
               <li
                 key={label}
-                className="inline-flex items-center gap-1 rounded-full bg-indigo-50 py-0.5 pl-2.5 pr-1 text-xs font-medium text-indigo-700"
+                className="inline-flex items-center gap-1 rounded bg-brand-soft py-0.5 pl-2.5 pr-1 text-xs font-medium text-brand-fg"
               >
                 {label}
                 <button
                   type="button"
                   aria-label={`Remove label ${label}`}
                   onClick={() => setLabels((current) => current.filter((item) => item !== label))}
-                  className="rounded-full px-1.5 hover:bg-indigo-100 active:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded px-1.5 hover:bg-brand/10 active:bg-brand/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   &times;
                 </button>
@@ -365,7 +365,7 @@ const TaskDetails = ({ task, project, canEdit, canDelete, onEdit, onDelete, onCl
               href={task.githubIssue.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="break-all rounded font-medium text-indigo-600 hover:text-indigo-700 active:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="break-all rounded font-medium text-brand-fg hover:text-brand-hover active:text-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
             >
               {task.githubIssue.title || task.githubIssue.url}
             </a>

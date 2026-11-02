@@ -91,7 +91,7 @@ const ProjectCreate = () => {
               error={fieldErrors.description}
             />
             <p
-              className={`mt-1 text-right text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-danger' : 'text-fg-secondary'}`}
+              className={`mt-1 text-right font-mono text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-danger' : 'text-fg-secondary'}`}
             >
               {values.description.length}/{DESCRIPTION_MAX}
             </p>

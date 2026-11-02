@@ -28,7 +28,7 @@ const AvatarGroup = ({ users = [], max = 4, size = 'sm', label, className = '' }
           role="img"
           aria-label={`and ${hidden.length} more: ${hiddenNames}`}
           title={hiddenNames}
-          className={`inline-flex shrink-0 items-center justify-center rounded-full bg-surface-muted font-medium text-fg-secondary ring-2 ring-surface ${overflowSizes[size] || overflowSizes.sm}`}
+          className={`inline-flex shrink-0 items-center justify-center rounded-full bg-surface-muted font-medium text-fg-secondary ring-2 ring-surface ${overflowSizes[size] || overflowSizes.sm}`} // unslop-ignore: the +n overflow is an avatar, full circle by design (docs/design.md section 5)
         >
           +{hidden.length}
         </span>

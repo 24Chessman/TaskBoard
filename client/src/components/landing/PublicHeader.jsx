@@ -1,5 +1,5 @@
 // PublicHeader (no props): the sticky top bar of the public pages. Logo (links to "/"), the section links
-// "Features" and "How it works" (they scroll smoothly, or jump when the user prefers reduced motion), a quiet
+// "Product" and "Roles" (they scroll smoothly, or jump when the user prefers reduced motion), a quiet
 // "Log in" link and a filled "Get started" button. Under 768px the section links move into a slide-over Drawer
 // opened by a menu button; it closes on Esc, on overlay click and after a link is chosen.
 // The bottom border only appears once the page has scrolled.
@@ -12,8 +12,8 @@ import Logo from '../Logo.jsx';
 import LinkButton from './LinkButton.jsx';
 
 const SECTION_LINKS = [
-  { id: 'features', label: 'Features' },
-  { id: 'how-it-works', label: 'How it works' },
+  { id: 'product', label: 'Product' },
+  { id: 'roles', label: 'Roles' },
 ];
 
 const linkClass =
@@ -53,7 +53,7 @@ const PublicHeader = () => {
 
   return (
     <header
-      className={`sticky top-0 z-30 border-b bg-surface/95 backdrop-blur transition-colors ${scrolled ? 'border-line' : 'border-transparent'}`}
+      className={`sticky top-0 z-30 border-b bg-surface transition-colors ${scrolled ? 'border-line' : 'border-transparent'}`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link

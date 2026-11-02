@@ -7,7 +7,7 @@ import TaskCard from './TaskCard.jsx';
 // Accent colours from ui_ux_brief.md section 2
 const ACCENTS = {
   todo: 'border-t-slate-400',
-  in_progress: 'border-t-indigo-500',
+  in_progress: 'border-t-brand',
   review: 'border-t-amber-500',
   done: 'border-t-emerald-500',
 };

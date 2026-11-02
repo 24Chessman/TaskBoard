@@ -90,7 +90,7 @@ const DemoOverlays = () => {
         <Dropdown
           label="Open user menu"
           triggerContent={<Avatar user={me} size="md" />}
-          triggerClassName="rounded-full"
+          triggerClassName="rounded-full" // unslop-ignore: demo of the circular avatar trigger
           header={
             <div>
               <p className="text-sm font-medium text-fg">Naitik Sutariya</p>

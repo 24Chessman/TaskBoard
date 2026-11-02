@@ -15,7 +15,7 @@ const variants = {
 
 const Badge = ({ variant = 'neutral', icon: Icon, className = '', children, ...rest }) => (
   <span
-    className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${variants[variant] || variants.neutral} ${className}`}
+    className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${variants[variant] || variants.neutral} ${className}`}
     {...rest}
   >
     {Icon && <Icon size={12} aria-hidden="true" className="shrink-0" />}
