@@ -2,12 +2,13 @@
 // Validates on submit, shows server errors ({ field, message }) under the matching field, shows a loading
 // button while saving, then a success toast and a redirect to the new project.
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createProject } from '../api/projects.js';
 import Button from '../components/Button.jsx';
 import Card from '../components/Card.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
+import PageHeader from '../components/shell/PageHeader.jsx';
 import Textarea from '../components/Textarea.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -62,16 +63,12 @@ const ProjectCreate = () => {
   };
 
   return (
-    <div className="max-w-md space-y-6">
-      <div>
-        <Link
-          to="/projects"
-          className="rounded text-sm font-medium text-indigo-600 hover:text-indigo-700 active:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-        >
-          Back to projects
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">New project</h1>
-      </div>
+    <div className="max-w-xl">
+      <PageHeader
+        breadcrumbs={[{ label: 'Projects', to: '/projects' }, { label: 'New project' }]}
+        title="New project"
+        description="A project holds a board of tasks and the people working on it."
+      />
 
       <Card className="p-6">
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -94,7 +91,7 @@ const ProjectCreate = () => {
               error={fieldErrors.description}
             />
             <p
-              className={`mt-1 text-right text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-red-600' : 'text-slate-500'}`}
+              className={`mt-1 text-right text-xs ${values.description.length > DESCRIPTION_MAX ? 'text-danger' : 'text-fg-secondary'}`}
             >
               {values.description.length}/{DESCRIPTION_MAX}
             </p>
