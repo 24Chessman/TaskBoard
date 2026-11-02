@@ -9,7 +9,7 @@ import LinkButton from './LinkButton.jsx';
 
 const Hero = () => (
   <section aria-labelledby="hero-title" className="overflow-hidden">
-    <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:min-h-[500px] lg:px-8 lg:py-24">
+    <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-16 sm:px-6 sm:pt-20 lg:min-h-[440px] lg:px-8 lg:pb-16 lg:pt-20">
       <div className="max-w-[520px] motion-safe:animate-fade-rise">
         <h1 id="hero-title" className="break-words text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
           Plan the work. Move it across the board.
@@ -26,7 +26,7 @@ const Hero = () => (
         <p className="mt-4 text-sm text-fg-secondary">Free for your team. No card needed.</p>
       </div>
 
-      <div className="mt-12 motion-safe:animate-fade-rise lg:absolute lg:left-[600px] lg:top-24 lg:mt-0 lg:w-[calc(100vw-max(0px,(100vw-1280px)/2)-600px)]">
+      <div className="mt-12 motion-safe:animate-fade-rise lg:absolute lg:left-[600px] lg:top-20 lg:mt-0 lg:w-[calc(100vw-max(0px,(100vw-1280px)/2)-600px)]">
         <div className="overflow-hidden">
           <BoardMock className="w-[780px] max-w-none lg:w-[860px]" />
         </div>

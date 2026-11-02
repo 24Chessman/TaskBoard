@@ -45,7 +45,7 @@ const ProductRows = () => (
       mock={<ActivityMock />}
       reverse
     />
-    <p className="mx-auto max-w-7xl px-4 pb-16 text-sm text-fg-secondary sm:px-6 lg:px-8">Dashboard charts are on the way.</p>
+    <p className="mx-auto max-w-7xl px-4 pb-12 text-sm text-fg-secondary sm:px-6 lg:px-8">Dashboard charts are on the way.</p>
   </>
 );
 
