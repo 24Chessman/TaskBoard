@@ -23,3 +23,6 @@ Thumbs.db
 # IDE configurations
 .vscode/
 .idea/
+
+# Playwright MCP working folder
+.playwright-mcp/
