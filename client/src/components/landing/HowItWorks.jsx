@@ -11,7 +11,7 @@ const HowItWorks = () => (
   <section id="how-it-works" aria-labelledby="how-title" className="scroll-mt-20 bg-app py-16 sm:py-24">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <h2 id="how-title" className="max-w-2xl text-3xl font-semibold tracking-tight text-fg">
-        How it works
+        From a new project to Done in three steps
       </h2>
 
       <ol className="mt-10 grid gap-8 md:grid-cols-3">
