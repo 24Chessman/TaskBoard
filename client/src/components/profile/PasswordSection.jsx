@@ -1,19 +1,19 @@
-// PasswordCard props: user, onUpdated (called with the saved user). Current password, new password (6+ characters)
+// PasswordSection props: user, onUpdated (called with the saved user). Current password, new password (6+ characters)
 // and a matching confirmation. A wrong current password comes back as a 400 and is shown under the field; it never
 // ends the session.
 import { useState } from 'react';
 import { updateUser } from '../../api/users.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import Button from '../Button.jsx';
-import Card from '../Card.jsx';
 import ErrorMessage from '../ErrorMessage.jsx';
 import Input from '../Input.jsx';
+import SettingsSection from '../settings/SettingsSection.jsx';
 import readServerError from './readServerError.js';
 
 const PASSWORD_MIN = 6;
 const empty = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
-const PasswordCard = ({ user, onUpdated }) => {
+const PasswordSection = ({ user, onUpdated }) => {
   const { showToast } = useToast();
   const [values, setValues] = useState(empty);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -59,47 +59,42 @@ const PasswordCard = ({ user, onUpdated }) => {
   };
 
   return (
-    <section aria-labelledby="profile-password-title">
-      <Card className="p-6">
-        <h2 id="profile-password-title" className="mb-4 text-base font-semibold text-fg">
-          Change password
-        </h2>
-        <form onSubmit={handleSubmit} noValidate className="max-w-md space-y-4">
-          {formError && <ErrorMessage message={formError} />}
-          <Input
-            label="Current password"
-            name="currentPassword"
-            type="password"
-            autoComplete="current-password"
-            value={values.currentPassword}
-            onChange={handleChange}
-            error={fieldErrors.currentPassword}
-          />
-          <Input
-            label="New password"
-            name="newPassword"
-            type="password"
-            autoComplete="new-password"
-            value={values.newPassword}
-            onChange={handleChange}
-            error={fieldErrors.newPassword}
-          />
-          <Input
-            label="Confirm new password"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            value={values.confirmPassword}
-            onChange={handleChange}
-            error={fieldErrors.confirmPassword}
-          />
-          <Button type="submit" loading={saving}>
-            Change password
-          </Button>
-        </form>
-      </Card>
-    </section>
+    <SettingsSection from="lg" contentClassName="max-w-[30rem]" title="Change password" description="Use at least 6 characters.">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {formError && <ErrorMessage message={formError} />}
+              <Input
+                label="Current password"
+                name="currentPassword"
+                type="password"
+                autoComplete="current-password"
+                value={values.currentPassword}
+                onChange={handleChange}
+                error={fieldErrors.currentPassword}
+              />
+              <Input
+                label="New password"
+                name="newPassword"
+                type="password"
+                autoComplete="new-password"
+                value={values.newPassword}
+                onChange={handleChange}
+                error={fieldErrors.newPassword}
+              />
+              <Input
+                label="Confirm new password"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                value={values.confirmPassword}
+                onChange={handleChange}
+                error={fieldErrors.confirmPassword}
+              />
+              <Button type="submit" loading={saving}>
+                Change password
+              </Button>
+            </form>
+    </SettingsSection>
   );
 };
 
-export default PasswordCard;
+export default PasswordSection;
