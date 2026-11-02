@@ -2,24 +2,23 @@
 // Search text, status filter and page number live in the URL query string (?search=&status=&page=),
 // so the Back button and shared links keep the filters. Uses useFetch for loading, error and empty states.
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { FolderKanban, Plus, Search, SearchX } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listProjects } from '../api/projects.js';
-import Badge from '../components/Badge.jsx';
 import Button from '../components/Button.jsx';
-import Card from '../components/Card.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
 import Loader from '../components/Loader.jsx';
 import Pagination from '../components/Pagination.jsx';
+import ProjectCard from '../components/projects/ProjectCard.jsx';
 import Select from '../components/Select.jsx';
+import PageHeader from '../components/shell/PageHeader.jsx';
 import useDebounce from '../hooks/useDebounce.js';
 import useFetch from '../hooks/useFetch.js';
 
 const PAGE_SIZE = 9;
 const STATUSES = ['active', 'archived'];
-
-const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -68,6 +67,7 @@ const ProjectList = () => {
     if (data.data.length === 0) {
       return hasFilters ? (
         <EmptyState
+          icon={SearchX}
           title="No projects match your filters"
           message="Try a different search or status."
           actionLabel="Clear filters"
@@ -75,6 +75,7 @@ const ProjectList = () => {
         />
       ) : (
         <EmptyState
+          icon={FolderKanban}
           title="No projects yet"
           message="Create your first project to start organising tasks."
           actionLabel="Create project"
@@ -88,26 +89,7 @@ const ProjectList = () => {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.data.map((project) => (
             <li key={project._id}>
-              <Link
-                to={`/projects/${project._id}`}
-                className="block h-full rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 active:opacity-80"
-              >
-                <Card className="flex h-full flex-col gap-3 transition-colors hover:border-indigo-300">
-                  <div className="flex items-start justify-between gap-2">
-                    <h2 className="min-w-0 break-words text-lg font-semibold text-slate-900">{project.name}</h2>
-                    <Badge variant={project.status === 'active' ? 'success' : 'neutral'}>
-                      {project.status === 'active' ? 'Active' : 'Archived'}
-                    </Badge>
-                  </div>
-                  <p className="line-clamp-2 text-sm text-slate-500">{project.description || 'No description'}</p>
-                  <div className="mt-auto flex items-center justify-between gap-2 text-xs text-slate-500">
-                    <span>
-                      {project.members.length} {project.members.length === 1 ? 'member' : 'members'}
-                    </span>
-                    <span>Updated {dateFormat.format(new Date(project.updatedAt))}</span>
-                  </div>
-                </Card>
-              </Link>
+              <ProjectCard project={project} />
             </li>
           ))}
         </ul>
@@ -123,25 +105,39 @@ const ProjectList = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-slate-900">Projects</h1>
-        <Button onClick={() => navigate('/projects/new')}>New project</Button>
-      </div>
+    <div>
+      <PageHeader
+        title="Projects"
+        actions={
+          <Button leftIcon={Plus} onClick={() => navigate('/projects/new')}>
+            New project
+          </Button>
+        }
+      />
 
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <Input
-          label="Search projects"
+          aria-label="Search projects"
           type="search"
+          leadingIcon={Search}
           value={searchText}
           onChange={(event) => setSearchText(event.target.value)}
           placeholder="Search by name"
+          className="min-w-0 flex-1 sm:max-w-xs"
         />
-        <Select label="Status" value={status} onChange={(event) => updateParams({ status: event.target.value, page: '' })}>
-          <option value="">All</option>
+        <Select
+          aria-label="Filter by status"
+          value={status}
+          onChange={(event) => updateParams({ status: event.target.value, page: '' })}
+          className="w-40"
+        >
+          <option value="">All statuses</option>
           <option value="active">Active</option>
           <option value="archived">Archived</option>
         </Select>
+        <p aria-live="polite" className="text-sm text-fg-secondary sm:ml-auto">
+          {data && !loading && !error ? `${data.total} ${data.total === 1 ? 'project' : 'projects'}` : ''}
+        </p>
       </div>
 
       {renderContent()}
