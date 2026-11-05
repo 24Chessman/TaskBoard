@@ -139,8 +139,6 @@ All paths start with `/api`. "Auth" means a valid JWT is required. `P-Member` me
 
 ### 3.5 Dashboard response shape
 
-### 3.5 Dashboard response shape
-
 ```
 GET /api/projects/:projectId/dashboard   (project member or admin)
 200 { success: true, data: {
