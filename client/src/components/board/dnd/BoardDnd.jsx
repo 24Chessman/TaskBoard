@@ -4,6 +4,7 @@
 // column, or outside every column, does nothing. A card is only ever moved between columns; their order is not kept.
 import { DndContext, DragOverlay, KeyboardSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useMemo, useState } from 'react';
+import DragEnabledContext from './DragEnabledContext.js';
 import Column from '../Column.jsx';
 import TaskCard from '../TaskCard.jsx';
 import { buildAnnouncements, screenReaderInstructions } from './announcements.js';
@@ -18,8 +19,14 @@ const BoardDnd = ({ columns, tasks, disabled, onMove, columnProps }) => {
   const mouse = useSensor(MousePointerSensor, mouseOptions);
   const touch = useSensor(TouchSensor, touchOptions);
   const keyboard = useSensor(KeyboardSensor, keyboardOptions);
-  const sensors = useSensors(...(disabled ? [] : [mouse, touch, keyboard]));
-  const accessibility = useMemo(() => ({ announcements: buildAnnouncements(columns), screenReaderInstructions }), [columns]);
+  const sensors = useSensors(mouse, touch, keyboard);
+  const accessibility = useMemo(
+    () => ({
+      announcements: buildAnnouncements(columns),
+      screenReaderInstructions,
+    }),
+    [columns]
+  );
   const [active, setActive] = useState(null); // { task, width } while a card is being dragged
   const byStatus = groupByStatus(columns, tasks);
 
@@ -30,38 +37,45 @@ const BoardDnd = ({ columns, tasks, disabled, onMove, columnProps }) => {
     if (move && isMove(columns, task, event.over?.id)) onMove(task, event.over.id);
     // A moved card is a new element in its new column, so keyboard users get their focus back on it
     if (event.activatorEvent instanceof KeyboardEvent) {
-      requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector(`[data-task-id="${task._id}"]`)?.focus()));
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => document.querySelector(`[data-task-id="${task._id}"]`)?.focus())
+      );
     }
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={collisionDetection}
-      accessibility={accessibility}
-      onDragStart={({ active: item }) => {
-        guardCardClicks();
-        setActive({ task: item.data.current.task, width: item.rect.current.initial?.width });
-      }}
-      onDragEnd={(event) => finish(event, true)}
-      onDragCancel={(event) => finish(event, false)}
-    >
-      <div
-        data-dragging={active ? 'true' : 'false'}
-        className="group/board flex gap-4 overflow-x-auto pb-4 lg:grid lg:grid-cols-4 lg:overflow-visible"
+    <DragEnabledContext.Provider value={!disabled}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={collisionDetection}
+        accessibility={accessibility}
+        onDragStart={({ active: item }) => {
+          guardCardClicks();
+          setActive({
+            task: item.data.current.task,
+            width: item.rect.current.initial?.width,
+          });
+        }}
+        onDragEnd={(event) => finish(event, true)}
+        onDragCancel={(event) => finish(event, false)}
       >
-        {columns.map((column) => (
-          <Column key={column.id} id={column.id} title={column.title} tasks={byStatus[column.id]} {...columnProps} />
-        ))}
-      </div>
-      <DragOverlay dropAnimation={prefersReducedMotion() ? null : undefined}>
-        {active && (
-          <div aria-hidden="true" style={{ width: active.width }}>
-            <TaskCard task={active.task} onOpen={noop} dragging buttonProps={{ tabIndex: -1 }} />
-          </div>
-        )}
-      </DragOverlay>
-    </DndContext>
+        <div
+          data-dragging={active ? 'true' : 'false'}
+          className="group/board flex gap-4 overflow-x-auto pb-4 lg:grid lg:grid-cols-4 lg:overflow-visible"
+        >
+          {columns.map((column) => (
+            <Column key={column.id} id={column.id} title={column.title} tasks={byStatus[column.id]} {...columnProps} />
+          ))}
+        </div>
+        <DragOverlay dropAnimation={prefersReducedMotion() ? null : undefined}>
+          {active && (
+            <div aria-hidden="true" style={{ width: active.width }}>
+              <TaskCard task={active.task} onOpen={noop} dragging buttonProps={{ tabIndex: -1 }} />
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
+    </DragEnabledContext.Provider>
   );
 };
 

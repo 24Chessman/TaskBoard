@@ -20,7 +20,9 @@ const useOptimisticStatus = ({ projectId, data, refetch }) => {
   useEffect(() => {
     setOverrides((current) => {
       const kept = Object.keys(current).filter((id) => running.current.has(id));
-      return kept.length === Object.keys(current).length ? current : Object.fromEntries(kept.map((id) => [id, current[id]]));
+      return kept.length === Object.keys(current).length
+        ? current
+        : Object.fromEntries(kept.map((id) => [id, current[id]]));
     });
   }, [data]);
 
