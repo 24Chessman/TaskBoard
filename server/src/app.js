@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 import activityRoutes from './routes/activity.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import commentRoutes from './routes/comment.routes.js';
@@ -32,15 +33,14 @@ if (process.env.NODE_ENV !== 'test') {
 // 3. Body parser
 app.use(express.json());
 
-// 4. Health check route
+// 4. Health check route (public): is the process up and is the database connected
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'TaskBoard API is healthy',
     data: {
       status: 'ok',
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
+      db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      uptime: Math.round(process.uptime()),
     },
   });
 });
