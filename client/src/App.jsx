@@ -1,5 +1,7 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
+import Loader from './components/Loader.jsx';
 import ProjectLayout from './components/ProjectLayout.jsx';
 import AdminRoute from './routes/AdminRoute.jsx';
 import GuestRoute from './routes/GuestRoute.jsx';
@@ -11,12 +13,14 @@ import ProjectList from './pages/ProjectList.jsx';
 import ProjectCreate from './pages/ProjectCreate.jsx';
 import Board from './pages/Board.jsx';
 import ProjectSettings from './pages/ProjectSettings.jsx';
-import Dashboard from './pages/Dashboard.jsx';
 import Activity from './pages/Activity.jsx';
 import Profile from './pages/Profile.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ComponentDemo from './pages/ComponentDemo.jsx';
+
+// The dashboard (and its chart library) loads only when the page is opened
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 
 const App = () => (
   <Routes>
@@ -40,7 +44,14 @@ const App = () => (
         <Route path="/projects/new" element={<ProjectCreate />} />
         <Route path="/projects/:projectId" element={<ProjectLayout />}>
           <Route index element={<Board />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="dashboard"
+            element={
+              <Suspense fallback={<Loader label="Loading dashboard" />}>
+                <Dashboard />
+              </Suspense>
+            }
+          />
           <Route path="activity" element={<Activity />} />
           <Route path="settings" element={<ProjectSettings />} />
         </Route>

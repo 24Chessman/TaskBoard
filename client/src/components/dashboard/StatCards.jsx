@@ -3,7 +3,7 @@
 // number, the icon and the line say it, so colour is never the only signal.
 import { AlarmClock } from 'lucide-react';
 import Card from '../Card.jsx';
-import { percent } from './helpers.js';
+import { segmentPercents } from './helpers.js';
 
 const Stat = ({ label, value, line, danger = false }) => (
   <Card className="p-4">
@@ -18,11 +18,13 @@ const Stat = ({ label, value, line, danger = false }) => (
 
 const StatCards = ({ data }) => {
   const { total, byStatus, overdue, dueSoon } = data;
+  // The same rounding as the status chart legend, so the two always show the same percents
+  const [, inProgressPercent, , donePercent] = segmentPercents([byStatus.todo, byStatus.in_progress, byStatus.review, byStatus.done]);
   return (
     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
       <Stat label="Total tasks" value={total} line="All tasks in this project" />
-      <Stat label="In progress" value={byStatus.in_progress} line={`${percent(byStatus.in_progress, total)}% of all tasks`} />
-      <Stat label="Done" value={byStatus.done} line={`${percent(byStatus.done, total)}% of all tasks`} />
+      <Stat label="In progress" value={byStatus.in_progress} line={`${inProgressPercent}% of all tasks`} />
+      <Stat label="Done" value={byStatus.done} line={`${donePercent}% of all tasks`} />
       <Stat label="Overdue" value={overdue} line="Not Done and due before today" danger={overdue > 0} />
       <Stat label="Due in 7 days" value={dueSoon} line="Not Done, due today to 7 days ahead" />
     </div>

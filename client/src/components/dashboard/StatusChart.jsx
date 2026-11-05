@@ -30,9 +30,9 @@ const StatusChart = ({ byStatus, total }) => {
       }}
     >
       <ResponsiveContainer width="100%" height={40}>
-        <BarChart layout="vertical" data={[byStatus]} margin={{ top: 4, right: 0, bottom: 4, left: 0 }} accessibilityLayer={false}>
+        <BarChart layout="vertical" data={[{ name: 'Tasks', ...byStatus }]} margin={{ top: 4, right: 0, bottom: 4, left: 0 }} accessibilityLayer={false}>
           <XAxis type="number" hide domain={[0, Math.max(total, 1)]} />
-          <YAxis type="category" hide dataKey="none" />
+          <YAxis type="category" hide dataKey="name" />
           {SEGMENTS.map((segment) => (
             <Bar
               key={segment.key}
