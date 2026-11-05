@@ -107,7 +107,7 @@ const GithubIssueField = ({ value, error, onChange, inputRef }) => {
               leadingIcon={Link2}
               placeholder="https://github.com/owner/repo/issues/1"
               value={text}
-              error={lookupError || error}
+              error={error || lookupError}
               onChange={(event) => {
                 setText(event.target.value);
                 setLookupError('');
