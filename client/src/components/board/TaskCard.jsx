@@ -1,4 +1,6 @@
 // TaskCard props: task (with assignee populated, possibly null), onOpen(task) called when the card is activated.
+// Optional, used by the draggable board card: buttonRef, buttonProps (extra props for the button, className is added
+// to the card's own), dragging (the lifted copy shown while dragging: shadow-lg and a cobalt border).
 // The whole card is ONE button with a single descriptive accessible name (title, priority, status, due date,
 // assignee, labels), so a keyboard or screen reader user gets everything in one stop. Its children are spans (a
 // button may only contain inline content) and nothing inside is interactive.
@@ -28,17 +30,21 @@ export const describeTask = (task) => {
   return parts.join('. ');
 };
 
-const TaskCard = ({ task, onOpen }) => {
+const TaskCard = ({ task, onOpen, buttonRef, buttonProps, dragging = false }) => {
   const overdue = isOverdue(task);
   const shownLabels = task.labels.slice(0, MAX_LABELS);
   const hiddenLabels = task.labels.length - shownLabels.length;
 
   return (
     <button
+      {...buttonProps}
+      ref={buttonRef}
       type="button"
       onClick={() => onOpen(task)}
       aria-label={describeTask(task)}
-      className="block w-full rounded-lg border border-line bg-surface p-3 text-left transition-colors hover:border-fg-muted active:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
+      className={`block w-full rounded-lg border bg-surface p-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring group-data-[dragging=true]/board:pointer-events-none ${
+        dragging ? 'border-brand shadow-lg cursor-grabbing' : 'border-line hover:border-fg-muted active:bg-surface-muted'
+      } ${buttonProps?.className || ''}`}
     >
       <span className="line-clamp-2 break-words text-sm font-medium text-fg">{task.title}</span>
 
