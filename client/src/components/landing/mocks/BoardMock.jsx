@@ -47,7 +47,7 @@ const FilterRow = () => (
 const BoardMock = ({ columnIds, showFilters = false, className = '' }) => {
   const columns = columnIds ? BOARD_COLUMNS.filter((column) => columnIds.includes(column.id)) : BOARD_COLUMNS;
   return (
-    <MockWindow title="Launch week (example)" className={className}>
+    <MockWindow title="Project TaskBoard" className={className}>
       {showFilters && <FilterRow />}
       <div className="flex gap-3 bg-app p-3">
         {columns.map((column) => (
