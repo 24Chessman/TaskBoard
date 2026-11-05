@@ -1,0 +1,13 @@
+{
+  "name": "taskboard",
+  "private": true,
+  "description": "TaskBoard: MERN project and task manager. The server serves the built client in production.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npm --prefix client ci --include=dev && npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "render-build": "npm --prefix server ci && npm --prefix client ci --include=dev && npm --prefix client run build"
+  }
+}
