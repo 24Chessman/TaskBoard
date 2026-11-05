@@ -2,7 +2,7 @@
 // The right-hand "Details" pane of the task drawer. The status Select saves at once (PATCH /status through
 // setTaskStatus, the same call the board used before): a toast on success, an error toast and the old status
 // back on failure. Everything else is read-only here; editing happens in the form (Edit button).
-// The GitHub issue slot (M4.5) shows nothing unless the task already has an issue.
+// The GitHub issue row shows the linked issue (state, title, link) and nothing when the task has none.
 import { AlarmClock, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { setTaskStatus } from '../../api/tasks.js';
@@ -10,6 +10,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { formatDate, isOverdue, localDateKey, toDateKey } from '../../utils/dates.js';
 import Avatar from '../Avatar.jsx';
 import Badge from '../Badge.jsx';
+import GithubIssueRow from './GithubIssueRow.jsx';
 import PriorityBadge from '../PriorityBadge.jsx';
 import Select from '../Select.jsx';
 import { messageOf, STATUSES } from './taskConstants.js';
@@ -98,15 +99,7 @@ const TaskDetailsPane = ({ task, project, onChanged }) => {
         <Row label="Created">{formatDate(localDateKey(new Date(task.createdAt)))}</Row>
         {task.githubIssue?.url && (
           <Row label="GitHub issue">
-            <a
-              href={task.githubIssue.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="break-all rounded font-medium text-brand-fg hover:text-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
-            >
-              {task.githubIssue.title || task.githubIssue.url}
-            </a>
-            {task.githubIssue.state && <Badge variant={task.githubIssue.state === 'open' ? 'success' : 'neutral'}>{task.githubIssue.state}</Badge>}
+            <GithubIssueRow issue={task.githubIssue} />
           </Row>
         )}
       </dl>

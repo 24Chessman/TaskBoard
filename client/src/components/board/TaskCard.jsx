@@ -5,7 +5,7 @@
 // Layout: title (two lines at most), then priority, up to two label chips and "+n", then the due date (with a
 // Calendar icon, or a red AlarmClock and the word Overdue when it has passed and the task is not done) and the
 // assignee's avatar at the far right. No shadow at rest: the border darkens on hover.
-import { AlarmClock, Calendar } from 'lucide-react';
+import { AlarmClock, Calendar, Link2 } from 'lucide-react';
 import { formatDate, isOverdue, toDateKey } from '../../utils/dates.js';
 import Avatar from '../Avatar.jsx';
 import Badge from '../Badge.jsx';
@@ -24,6 +24,7 @@ export const describeTask = (task) => {
     task.assignee ? `Assigned to ${task.assignee.name}` : 'Unassigned',
   ];
   if (task.labels.length > 0) parts.push(`Labels ${task.labels.join(', ')}`);
+  if (task.githubIssue?.url) parts.push('Linked GitHub issue');
   return parts.join('. ');
 };
 
@@ -46,6 +47,11 @@ const TaskCard = ({ task, onOpen }) => {
         {shownLabels.map((label) => (
           <Badge key={label}>{label}</Badge>
         ))}
+        {task.githubIssue?.url && (
+          <Badge icon={Link2} title="Linked GitHub issue">
+            GitHub
+          </Badge>
+        )}
         {hiddenLabels > 0 && <Badge title={task.labels.slice(MAX_LABELS).join(', ')}>+{hiddenLabels}</Badge>}
         {/* Without a due date the avatar joins the first row, so the card stays short */}
         {!task.dueDate && <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" className="ml-auto" />}

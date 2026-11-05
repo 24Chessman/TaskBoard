@@ -19,7 +19,7 @@ const GithubIssueRow = ({ issue, action, showUrl = false }) => {
   const state = STATES[issue.state];
 
   return (
-    <div className="min-w-0">
+    <div className="w-full min-w-0">
       <div className="flex min-w-0 items-center gap-2">
         {state && (
           <Badge variant={state.variant} icon={state.icon} className="shrink-0">
