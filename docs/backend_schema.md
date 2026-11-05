@@ -139,19 +139,23 @@ All paths start with `/api`. "Auth" means a valid JWT is required. `P-Member` me
 
 ### 3.5 Dashboard response shape
 
-```json
-{
-  "success": true,
-  "data": {
-    "byStatus": { "todo": 4, "in_progress": 2, "review": 1, "done": 7 },
-    "byPriority": { "low": 3, "medium": 8, "high": 3 },
-    "overdue": 2,
-    "perMember": [ { "userId": "...", "name": "Naitik", "total": 5, "done": 3 } ]
-  }
-}
+### 3.5 Dashboard response shape
+
+```
+GET /api/projects/:projectId/dashboard   (project member or admin)
+200 { success: true, data: {
+  total, byStatus: {...}, byPriority: {...}, overdue, dueSoon, unassigned,
+  perMember: [ { userId, name, total, done } ],
+  topLabels: [ { label, count } ],
+  createdPerDay: [ { date: "YYYY-MM-DD", count } ]
+} }
 ```
 
-Computed with MongoDB aggregation pipelines (`$match`, `$group`).
+Rules:
+- `overdue`: not Done and due before today (UTC). `dueSoon`: not Done and due from today through today + 7 days, inclusive. `unassigned`: open tasks with no assignee.
+- `perMember`: only assignees who have tasks, sorted by total desc then name. A deleted account is one row with `userId` null and name "Deleted user". No emails.
+- `topLabels`: up to 8, count desc then label asc. `createdPerDay`: the last 14 UTC days, oldest first, zeros included.
+- Errors: 400 invalid id, 401 no token, 403 outsider, 404 unknown project. The query string is ignored.
 
 ### 3.6 Rubric coverage check
 
