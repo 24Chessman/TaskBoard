@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import activityRoutes from './routes/activity.routes.js';
@@ -10,20 +9,23 @@ import githubRoutes from './routes/github.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import taskRoutes from './routes/task.routes.js';
 import userRoutes from './routes/user.routes.js';
+import corsPolicy from './middleware/corsPolicy.js';
 import notFound from './middleware/notFound.js';
+import securityHeaders from './middleware/securityHeaders.js';
 import serveClient from './middleware/serveClient.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-// 1. CORS middleware
-const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-app.use(
-  cors({
-    origin: clientOrigin,
-    credentials: true,
-  })
-);
+app.disable('x-powered-by');
+// In production the app sits behind the host's proxy: trust its X-Forwarded-* headers (one hop)
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+
+// 0. Security headers
+app.use(securityHeaders);
+
+// 1. CORS middleware (see middleware/corsPolicy.js)
+app.use(corsPolicy);
 
 // 2. Request logger (Morgan)
 if (process.env.NODE_ENV !== 'test') {
