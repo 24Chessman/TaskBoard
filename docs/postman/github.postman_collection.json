@@ -1,0 +1,788 @@
+{
+  "info": {
+    "name": "TaskBoard GitHub",
+    "description": "M4.5a GitHub issue lookup (GET /api/github/issue?url=) and the githubIssue safety rule on tasks. Run the requests in order: Setup registers a user and creates a project.\n\nNote: the first lookup request calls the real GitHub API from the server, so it needs internet access and can hit GitHub's rate limit (60 requests per hour without a GITHUB_TOKEN). It accepts 200, 429 or 502 so an offline run does not fail; every other request is answered by TaskBoard itself.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "password",
+      "value": "secret123"
+    },
+    {
+      "key": "runId",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Register a user",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('runId', String(Date.now()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('token', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GitHub Tester\",\n  \"email\": \"github-{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create a project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('projectId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GitHub project {{runId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lookup",
+      "item": [
+        {
+          "name": "Valid public pull request (needs internet)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 (found), 429 (GitHub rate limit) or 502 (no internet)', () => pm.expect(pm.response.code).to.be.oneOf([200, 429, 502]));",
+                  "if (pm.response.code === 200) {",
+                  "  const d = pm.response.json().data;",
+                  "  pm.test('returns the canonical url, a title and a state', () => { pm.expect(d.url).to.eql('https://github.com/24Chessman/TaskBoard/pull/1'); pm.expect(d.title).to.be.a('string').and.not.empty; pm.expect(d.state).to.be.oneOf(['open', 'closed']); });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://github.com/24Chessman/TaskBoard/pull/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://github.com/24Chessman/TaskBoard/pull/1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Not a GitHub issue link - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://github.com/24Chessman/TaskBoard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://github.com/24Chessman/TaskBoard"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other host - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://evil.example.com/24Chessman/TaskBoard/issues/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://evil.example.com/24Chessman/TaskBoard/issues/1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Host that only starts with github.com - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://github.com.evil.com/o/r/issues/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://github.com.evil.com/o/r/issues/1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Not https - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=http://github.com/24Chessman/TaskBoard/issues/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "http://github.com/24Chessman/TaskBoard/issues/1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "javascript: link - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=javascript:alert(1)",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "javascript:alert(1)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Missing url - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ]
+            }
+          }
+        },
+        {
+          "name": "url sent twice (array) - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://github.com/o/r/issues/1&url=https://github.com/o/r/issues/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://github.com/o/r/issues/1"
+                },
+                {
+                  "key": "url",
+                  "value": "https://github.com/o/r/issues/2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Operator-style url - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names the url field', () => pm.expect(pm.response.json().errors[0].field).to.eql('url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url[$ne]=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url[$ne]",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "No token - 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/github/issue?url=https://github.com/24Chessman/TaskBoard/pull/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "github",
+                "issue"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://github.com/24Chessman/TaskBoard/pull/1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task githubIssue rule",
+      "item": [
+        {
+          "name": "Create a task with a valid githubIssue - 201, canonical url",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set('taskId', d._id);",
+                  "pm.test('url is stored in canonical form', () => pm.expect(d.githubIssue.url).to.eql('https://github.com/24Chessman/TaskBoard/pull/1'));",
+                  "pm.test('title and state are kept', () => { pm.expect(d.githubIssue.title).to.eql('Example title'); pm.expect(d.githubIssue.state).to.eql('open'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Linked task\",\n  \"githubIssue\": {\n    \"url\": \"https://www.github.com/24Chessman/TaskBoard/pull/1/?tab=files#top\",\n    \"title\": \"Example title\",\n    \"state\": \"open\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create a task with javascript:alert(1) - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error names githubIssue', () => pm.expect(pm.response.json().errors[0].field).to.eql('githubIssue'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bad link\",\n  \"githubIssue\": {\n    \"url\": \"javascript:alert(1)\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create a task with another host - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Other host\",\n  \"githubIssue\": {\n    \"url\": \"https://evil.example.com/o/r/issues/1\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create a task with an invalid state - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bad state\",\n  \"githubIssue\": {\n    \"url\": \"https://github.com/o/r/issues/1\",\n    \"state\": \"merged\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update without githubIssue clears it - 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('githubIssue is gone', () => pm.expect(pm.response.json().data.githubIssue).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Linked task\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "Delete the project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
