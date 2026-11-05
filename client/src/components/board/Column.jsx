@@ -3,21 +3,25 @@
 // add the board refetches). One board column: a header with the status icon, the name, a count and a small Plus
 // button; the cards; and the quick add field at the bottom. The status is shown by icon and text, never by a
 // coloured border. An empty column shows a dashed outline with "No tasks" instead of a tall empty block.
+import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { useId } from 'react';
 import IconButton from '../IconButton.jsx';
 import { STATUS_LOZENGES } from '../StatusLozenge.jsx';
+import DraggableCard from './dnd/DraggableCard.jsx';
 import QuickAdd from './QuickAdd.jsx';
-import TaskCard from './TaskCard.jsx';
 
 const Column = ({ id, title, tasks, project, onOpenTask, onAddTask, onCreated }) => {
   const headingId = useId();
   const StatusIcon = (STATUS_LOZENGES[id] || STATUS_LOZENGES.todo).icon;
+  // The whole column is a drop zone; while a card is over it the column gets a cobalt tint and a ring
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <section
+      ref={setNodeRef}
       aria-labelledby={headingId}
-      className="flex min-h-[10rem] min-w-[280px] flex-1 flex-col gap-2 rounded-lg bg-slate-100/70 p-3 lg:min-w-0"
+      className={`flex min-h-[10rem] min-w-[280px] flex-1 flex-col gap-2 rounded-lg p-3 lg:min-w-0 ${isOver ? 'bg-brand-soft ring-2 ring-brand-ring' : 'bg-slate-100/70'}`}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -43,7 +47,7 @@ const Column = ({ id, title, tasks, project, onOpenTask, onAddTask, onCreated })
         <ul className="space-y-2">
           {tasks.map((task) => (
             <li key={task._id}>
-              <TaskCard task={task} onOpen={onOpenTask} />
+              <DraggableCard task={task} onOpen={onOpenTask} />
             </li>
           ))}
         </ul>

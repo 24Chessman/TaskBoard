@@ -8,7 +8,7 @@ import { Plus } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { listTasks } from '../api/tasks.js';
 import BoardToolbar from '../components/board/BoardToolbar.jsx';
-import Column from '../components/board/Column.jsx';
+import BoardDnd from '../components/board/dnd/BoardDnd.jsx';
 import { hasActiveFilters } from '../components/board/filters.js';
 import useBoardFilters from '../components/board/useBoardFilters.js';
 import Button from '../components/Button.jsx';
@@ -19,6 +19,7 @@ import PageHeader from '../components/shell/PageHeader.jsx';
 import TaskDrawer from '../components/task/TaskDrawer.jsx';
 import TaskModal from '../components/TaskModal.jsx';
 import useFetch from '../hooks/useFetch.js';
+import useOptimisticStatus from '../hooks/useOptimisticStatus.js';
 import useProject from '../hooks/useProject.js';
 
 const LIMIT = 100;
@@ -58,6 +59,9 @@ const Board = () => {
   if (data) lastData.current = data;
   const shown = data || lastData.current;
 
+  // Cards dragged to another column show there at once; the status is saved with PATCH /status
+  const { tasks: boardTasks, move } = useOptimisticStatus({ projectId: project._id, data: shown, refetch });
+
   const hasFilters = hasActiveFilters(filters);
   const openCreate = (status) => setModal({ mode: 'create', status: typeof status === 'string' ? status : undefined });
   const openTask = (task) => setModal({ taskId: task._id });
@@ -84,9 +88,6 @@ const Board = () => {
       );
     }
 
-    const byStatus = Object.fromEntries(COLUMNS.map((column) => [column.id, []]));
-    shown.data.forEach((task) => byStatus[task.status]?.push(task));
-
     return (
       <>
         {shown.total > shown.data.length && (
@@ -94,20 +95,13 @@ const Board = () => {
             Showing the newest {shown.data.length} of {shown.total} tasks. Use the filters to narrow them down.
           </p>
         )}
-        <div className="flex gap-4 overflow-x-auto pb-4 lg:grid lg:grid-cols-4 lg:overflow-visible">
-          {COLUMNS.map((column) => (
-            <Column
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              tasks={byStatus[column.id]}
-              project={project}
-              onOpenTask={openTask}
-              onAddTask={openCreate}
-              onCreated={refetch}
-            />
-          ))}
-        </div>
+        <BoardDnd
+          columns={COLUMNS}
+          tasks={boardTasks}
+          disabled={Boolean(modal)}
+          onMove={move}
+          columnProps={{ project, onOpenTask: openTask, onAddTask: openCreate, onCreated: refetch }}
+        />
       </>
     );
   };
