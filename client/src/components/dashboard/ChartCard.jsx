@@ -6,7 +6,7 @@ import Card from '../Card.jsx';
 
 const ChartCard = ({ title, description, summary, caption, data, children }) => (
   <section className="min-w-0">
-    <Card className="p-5">
+    <Card className="h-full p-5">
     <h2 className="text-base font-semibold text-fg">{title}</h2>
     <p className="mt-1 text-sm text-fg-secondary">{description}</p>
     <div role="img" aria-label={summary} className="mt-4">

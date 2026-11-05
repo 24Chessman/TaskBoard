@@ -47,7 +47,7 @@ const WorkloadChart = ({ perMember, unassigned }) => {
               }}
             />
             <Bar dataKey="done" stackId="work" barSize={14} fill="currentColor" className="text-brand" isAnimationActive={false} />
-            <Bar dataKey="rest" stackId="work" barSize={14} fill="currentColor" className="text-brand/25" isAnimationActive={false}>
+            <Bar dataKey="rest" stackId="work" barSize={14} fill="currentColor" className="text-brand/20 [&_path]:stroke-brand [&_path]:stroke-1" isAnimationActive={false}>
               <LabelList dataKey="text" position="right" className={VALUE_LABEL} />
             </Bar>
           </BarChart>

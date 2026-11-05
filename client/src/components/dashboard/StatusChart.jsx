@@ -46,7 +46,7 @@ const StatusChart = ({ byStatus, total }) => {
           ))}
         </BarChart>
       </ResponsiveContainer>
-      <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+      <ul className="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
         {SEGMENTS.map((segment, i) => {
           const { label, icon: Icon } = STATUS_LOZENGES[segment.key];
           return (
