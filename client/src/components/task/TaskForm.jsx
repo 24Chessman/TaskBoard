@@ -2,9 +2,10 @@
 // (create only: the status the new task starts in, default "todo"), onSaved(), onCancel(), onDirtyChange(bool)
 // (optional: called with true while there is unsaved input). One form for create (inside TaskModal) and edit (inside
 // TaskDrawer). Validates on submit and shows server errors under the matching field.
-// Note: PUT /tasks/:id REPLACES the editable fields, so the edit form always sends all of them (and the existing
-// GitHub issue unchanged); create sends only what was filled in.
-import { useEffect, useRef, useState } from 'react';
+// Note: PUT /tasks/:id REPLACES the editable fields, so the edit form always sends all of them (the GitHub issue
+// linked in the form, or none when it was removed); create sends only what was filled in.
+// A link typed in the GitHub issue field but not looked up blocks saving until it is looked up or cleared.
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createTask, updateTask } from '../../api/tasks.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { toDateKey } from '../../utils/dates.js';
@@ -13,12 +14,13 @@ import ErrorMessage from '../ErrorMessage.jsx';
 import Input from '../Input.jsx';
 import Select from '../Select.jsx';
 import Textarea from '../Textarea.jsx';
-import { buildTaskBody, DESCRIPTION_MAX, validateTask } from './taskBody.js';
-import { messageOf, STATUSES } from './taskConstants.js';
+import GithubIssueField from './GithubIssueField.jsx';
+import { buildTaskBody, DESCRIPTION_MAX, readServerErrors, validateTask } from './taskBody.js';
+import { STATUSES } from './taskConstants.js';
 
 const LABELS_MAX = 5;
 const LABEL_MAX_LENGTH = 20;
-const FORM_FIELDS = ['title', 'description', 'priority', 'assignee', 'labels', 'dueDate', 'status'];
+const LOOK_UP_FIRST = 'Look up the link first, or clear the field';
 
 const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChange }) => {
   const { showToast } = useToast();
@@ -38,12 +40,22 @@ const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChan
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  // The linked GitHub issue (or none) and a link that was typed but not looked up yet
+  const startIssue = task?.githubIssue?.url ? task.githubIssue : null;
+  const [github, setGithub] = useState({ issue: startIssue, text: '' });
+  const githubRef = useRef(null);
+  const onGithubChange = useCallback((next) => setGithub(next), []);
+  useEffect(() => {
+    setFieldErrors((current) => (current.githubIssue ? { ...current, githubIssue: undefined } : current));
+  }, [github]);
 
   // Tell the parent whether there is anything unsaved (so closing the drawer can ask before discarding it)
-  const initial = useRef(JSON.stringify([values, labels]));
+  const snapshot = () => JSON.stringify([values, labels, github.issue?.url || '']);
+  const initial = useRef(snapshot());
   useEffect(() => {
-    onDirtyChange?.(JSON.stringify([values, labels]) !== initial.current || Boolean(labelInput.trim()));
-  }, [values, labels, labelInput, onDirtyChange]);
+    onDirtyChange?.(snapshot() !== initial.current || Boolean(labelInput.trim()) || Boolean(github.text.trim()));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values, labels, labelInput, github, onDirtyChange]);
   useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
 
   const handleChange = (event) => {
@@ -88,10 +100,14 @@ const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChan
     const { next: finalLabels, error: pendingLabelError } = labelInput.trim() ? addLabels(labelInput) : { next: labels, error: '' };
 
     const errors = validateTask(values);
+    if (github.text.trim()) errors.githubIssue = LOOK_UP_FIRST;
     setFieldErrors(errors);
-    if (Object.keys(errors).length > 0 || pendingLabelError) return;
+    if (Object.keys(errors).length > 0 || pendingLabelError) {
+      if (Object.keys(errors).join() === 'githubIssue') githubRef.current?.querySelector('input')?.focus();
+      return;
+    }
 
-    const body = buildTaskBody({ task, values, labels: finalLabels });
+    const body = buildTaskBody({ task, values, labels: finalLabels, githubIssue: github.issue });
 
     setSaving(true);
     try {
@@ -100,19 +116,9 @@ const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChan
       showToast(task ? 'Task updated' : 'Task created', 'success');
       onSaved();
     } catch (error) {
-      const list = error.response?.data?.errors;
-      if (Array.isArray(list) && list.length > 0) {
-        const mapped = {};
-        const other = [];
-        list.forEach(({ field, message }) => {
-          if (FORM_FIELDS.includes(field)) mapped[field] = message;
-          else other.push(message);
-        });
-        setFieldErrors(mapped);
-        setFormError(other.join(' '));
-      } else {
-        setFormError(messageOf(error));
-      }
+      const { fieldErrors: serverErrors, formError: message } = readServerErrors(error);
+      setFieldErrors(serverErrors);
+      setFormError(message);
       setSaving(false);
     }
   };
@@ -197,6 +203,8 @@ const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChan
           </ul>
         )}
       </div>
+
+      <GithubIssueField value={startIssue} error={fieldErrors.githubIssue} onChange={onGithubChange} inputRef={githubRef} />
 
       <div className="flex justify-end gap-2">
         <Button variant="secondary" onClick={onCancel} disabled={saving}>
