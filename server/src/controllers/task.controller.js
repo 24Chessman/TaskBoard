@@ -7,6 +7,7 @@ import Task from '../models/Task.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { TASK_PRIORITIES, TASK_STATUSES } from '../utils/constants.js';
+import { parseGithubUrl } from '../utils/githubUrl.js';
 import {
   escapeRegex,
   readDate,
@@ -17,6 +18,7 @@ import {
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
+const GITHUB_TITLE_MAX = 200;
 const USER_FIELDS = 'name email';
 const POPULATE = [
   { path: 'assignee', select: USER_FIELDS },
@@ -45,6 +47,27 @@ const readOptionalString = (value, name) => {
   return value;
 };
 
+const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const readGithubIssue = (issue) => {
+  if (!isPlainObject(issue)) throw invalid('githubIssue', 'githubIssue must be an object');
+  const parsed = parseGithubUrl(issue.url);
+  if (!parsed) throw invalid('githubIssue', 'githubIssue.url must be a link to a GitHub issue or pull request');
+  const result = { url: parsed.canonicalUrl };
+  if (issue.title !== undefined) {
+    const title = typeof issue.title === 'string' ? issue.title.trim() : null;
+    if (title === null || title.length > GITHUB_TITLE_MAX) {
+      throw invalid('githubIssue', `githubIssue.title must be text of at most ${GITHUB_TITLE_MAX} characters`);
+    }
+    result.title = title;
+  }
+  if (issue.state !== undefined) {
+    if (issue.state !== 'open' && issue.state !== 'closed') throw invalid('githubIssue', 'githubIssue.state must be open or closed');
+    result.state = issue.state;
+  }
+  return result;
+};
+
 const isMember = (project, userId) => project.members.some((member) => String(member.user) === String(userId));
 
 // Validates the fields shared by create and PUT and returns only the ones that were sent.
@@ -71,18 +94,11 @@ const readTaskFields = (body, project) => {
 
   if (dueDate !== undefined && dueDate !== null) fields.dueDate = readDate(dueDate, 'dueDate');
 
-  if (githubIssue !== undefined) {
-    const issue = githubIssue;
-    if (!issue || typeof issue !== 'object' || Array.isArray(issue)) {
-      throw invalid('githubIssue', 'githubIssue must be an object');
-    }
-    const { url, title: issueTitle, state } = issue;
-    if (typeof url !== 'string' || !url.startsWith('https://github.com/')) {
-      throw invalid('githubIssue.url', 'githubIssue.url must start with https://github.com/');
-    }
-    fields.githubIssue = { url };
-    if (issueTitle !== undefined) fields.githubIssue.title = readOptionalString(issueTitle, 'githubIssue.title');
-    if (state !== undefined) fields.githubIssue.state = readOptionalString(state, 'githubIssue.state');
+  // Missing, null or {} means no GitHub issue. Otherwise the url must be a real GitHub issue or pull request link
+  // (stored in its canonical form), the title a string of at most 200 characters and the state "open" or "closed".
+  // title and state come from the client: the lookup endpoint (GET /api/github/issue) is what verifies them.
+  if (githubIssue !== undefined && githubIssue !== null && !(isPlainObject(githubIssue) && Object.keys(githubIssue).length === 0)) {
+    fields.githubIssue = readGithubIssue(githubIssue);
   }
 
   return fields;
