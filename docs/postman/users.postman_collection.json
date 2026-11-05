@@ -411,7 +411,19 @@
     },
     {
       "name": "Admin (optional)",
-      "description": "Needs adminEmail and adminPassword filled in locally. Leave them empty in the committed file. Run in order.",
+      "description": "Needs adminEmail and adminPassword filled in locally. Leave them empty in the committed file. Run in order. Without both values the whole folder is skipped.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Skip the optional admin requests when no admin account is configured locally",
+              "if (!pm.collectionVariables.get('adminEmail') || !pm.collectionVariables.get('adminPassword')) { pm.execution.skipRequest(); }"
+            ]
+          }
+        }
+      ],
       "item": [
         {
           "name": "Admin login",
