@@ -10,6 +10,7 @@ import projectRoutes from './routes/project.routes.js';
 import taskRoutes from './routes/task.routes.js';
 import userRoutes from './routes/user.routes.js';
 import notFound from './middleware/notFound.js';
+import serveClient from './middleware/serveClient.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
@@ -53,6 +54,9 @@ app.use('/api/projects/:projectId/dashboard', dashboardRoutes);
 app.use('/api/projects/:projectId/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/github', githubRoutes);
+
+// 5b. Production only: the built React app and its deep-link fallback
+serveClient(app);
 
 // 6. Not found middleware (unmatched routes)
 app.use(notFound);
