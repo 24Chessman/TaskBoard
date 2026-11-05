@@ -55,7 +55,7 @@ Index: `members.user` (to list a user's projects quickly).
 | `createdBy` | ObjectId(User) | required, set by server |
 | `labels` | [String] | optional, max 5, each 1 to 20 chars, lowercase |
 | `dueDate` | Date | optional |
-| `githubIssue` | `{ url, title, state }` | optional; filled from the GitHub lookup |
+| `githubIssue` | `{ url, title, state }` | optional; filled from the GitHub lookup. `url` is a github.com issue or pull request link stored in canonical form (`https://github.com/{owner}/{repo}/issues/{n}` or `/pull/{n}`), `title` is at most 200 chars, `state` is `open` or `closed`. `null` or `{}` means no issue. Validation errors use `field: "githubIssue"`. Title and state come from the lookup and are not re-verified on save. |
 
 Indexes: `{ project, status }`, `{ project, dueDate }`.
 
@@ -125,6 +125,8 @@ All paths start with `/api`. "Auth" means a valid JWT is required. `P-Member` me
 | GET | `/github/issue?url=` | Auth | Look up a GitHub issue (title, state, url) | 200 |
 
 `sort` accepts `dueDate`, `-dueDate`, `priority`, `createdAt`, `-createdAt`.
+
+**GitHub lookup.** `GET /github/issue?url=` returns `{ success: true, data: { url, title, state } }`: `url` in canonical form, `title` up to 200 characters, `state` `open` or `closed` (merged pull requests report `closed`). Only `https://github.com` issue and pull request links are accepted. Errors: 400 invalid or non-GitHub url, 401 no token, 404 issue not found or private, 429 GitHub rate limit, 502 GitHub unreachable. Successful lookups are cached in memory for 5 minutes (up to 100 entries).
 
 ### 3.4 Comments, Activity, Dashboard (Jaydip)
 
