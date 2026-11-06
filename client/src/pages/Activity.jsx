@@ -11,7 +11,7 @@ import { NoActivityArt } from '../components/art/EmptyArt.jsx';
 import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
-import Loader from '../components/Loader.jsx';
+import PageSkeleton from '../components/PageSkeleton.jsx';
 import Pagination from '../components/Pagination.jsx';
 import PageHeader from '../components/shell/PageHeader.jsx';
 import useFetch from '../hooks/useFetch.js';
@@ -32,7 +32,7 @@ const Activity = () => {
   );
 
   const renderFeed = () => {
-    if (loading && !data) return <Loader label="Loading activity" />;
+    if (loading && !data) return <PageSkeleton variant="rows" label="Loading activity" />;
     if (error) return <ErrorMessage message={error} onRetry={refetch} />;
 
     if (data.total === 0) {

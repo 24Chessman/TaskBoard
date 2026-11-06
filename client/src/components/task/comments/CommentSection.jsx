@@ -9,6 +9,7 @@
 // in place. Esc: the drawer and a confirm dialog both listen for Esc on the document, so while a delete
 // confirmation is open (or the cursor is in the inline edit box) a capture listener on window handles Esc first and
 // closes only that top layer; the drawer stays open. A 400 is shown under the box; any other error is a toast.
+import errorMessage from '../../../utils/errorMessage.js';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createComment, deleteComment, listComments, updateComment } from '../../../api/comments.js';
 import { useToast } from '../../../context/ToastContext.jsx';
@@ -93,8 +94,7 @@ const CommentSection = ({ projectId, taskId, onDirtyChange }) => {
   // A 400 is a validation message for the field; any other refusal (403, 404, network) is a toast
   const fail = useCallback(
     (requestError, setFieldError) => {
-      const body = requestError.response?.data;
-      const message = body?.errors?.[0]?.message || body?.message || 'Something went wrong. Please try again.';
+      const message = errorMessage(requestError);
       if (requestError.response?.status === 400) setFieldError(message);
       else showToast(message, 'error');
     },
@@ -152,7 +152,7 @@ const CommentSection = ({ projectId, taskId, onDirtyChange }) => {
       setComments((current) => current.filter((comment) => comment._id !== pendingDelete._id));
       showToast('Comment deleted', 'success');
     } catch (requestError) {
-      showToast(requestError.response?.data?.message || 'Could not delete the comment.', 'error');
+      showToast(errorMessage(requestError, 'Could not delete the comment.'), 'error');
     } finally {
       setPendingDelete(null);
       setDeleting(false);
