@@ -14,7 +14,7 @@ export const buttonVariants = {
 export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2';
 
 const sizes = {
-  sm: 'h-9 gap-1.5 px-2.5 text-xs sm:h-8',
+  sm: 'h-10 gap-1.5 px-2.5 text-xs sm:h-8',
   md: 'h-10 gap-2 px-3.5 text-sm sm:h-9',
 };
 

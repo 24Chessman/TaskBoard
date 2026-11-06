@@ -59,7 +59,7 @@ const PublicHeader = () => {
         <Link
           to="/"
           aria-label="TaskBoard home"
-          className="rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2"
+          className="inline-flex min-h-10 items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2"
         >
           <Logo />
         </Link>
