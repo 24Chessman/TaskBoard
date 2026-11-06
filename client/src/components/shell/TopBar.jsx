@@ -63,7 +63,7 @@ const TopBar = ({ onOpenNavigation }) => {
       ) : (
         <Link
           to="/login"
-          className={`rounded-md px-3 py-2 text-sm font-medium text-fg-secondary hover:bg-surface-muted hover:text-fg ${ring}`}
+          className={`inline-flex min-h-10 items-center rounded-md px-3 py-2 text-sm font-medium text-fg-secondary hover:bg-surface-muted hover:text-fg ${ring}`}
         >
           Log in
         </Link>

@@ -17,7 +17,7 @@ const SECTION_LINKS = [
 ];
 
 const linkClass =
-  'rounded-md px-3 py-2 text-sm font-medium text-fg-secondary transition-colors hover:bg-surface-muted hover:text-fg active:bg-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring';
+  'inline-flex min-h-10 items-center rounded-md px-3 py-2 text-sm font-medium text-fg-secondary transition-colors hover:bg-surface-muted hover:text-fg active:bg-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring';
 
 const scrollToSection = (id) => {
   const target = document.getElementById(id);
