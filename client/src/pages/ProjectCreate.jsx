@@ -1,6 +1,7 @@
 // Create project page (/projects/new). Name (3 to 80 characters) and description (max 500, with a live counter).
 // Validates on submit, shows server errors ({ field, message }) under the matching field, shows a loading
 // button while saving, then a success toast and a redirect to the new project.
+import errorMessage from '../utils/errorMessage.js';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createProject } from '../api/projects.js';
@@ -56,7 +57,7 @@ const ProjectCreate = () => {
         });
         setFieldErrors(mapped);
       } else {
-        setFormError(data?.message || 'Could not create the project. Please try again.');
+        setFormError(errorMessage(error, 'Could not create the project. Please try again.'));
       }
       setSubmitting(false);
     }

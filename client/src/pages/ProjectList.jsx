@@ -10,7 +10,7 @@ import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
-import Loader from '../components/Loader.jsx';
+import PageSkeleton from '../components/PageSkeleton.jsx';
 import Pagination from '../components/Pagination.jsx';
 import ProjectCard from '../components/projects/ProjectCard.jsx';
 import Select from '../components/Select.jsx';
@@ -62,7 +62,7 @@ const ProjectList = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <Loader label="Loading projects" />;
+    if (loading) return <PageSkeleton variant="cards" label="Loading projects" />;
     if (error) return <ErrorMessage message={error} onRetry={refetch} />;
 
     if (data.data.length === 0) {
