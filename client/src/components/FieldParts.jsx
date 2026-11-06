@@ -5,7 +5,7 @@
 import { CircleAlert } from 'lucide-react';
 
 export const fieldClasses = (hasError) =>
-  `block w-full rounded-md border bg-surface px-3 py-1.5 text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-40 ${
+  `block w-full rounded-md border bg-surface px-3 py-1.5 max-sm:py-2.5 text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-40 ${
     hasError
       ? 'border-danger focus:border-danger focus:ring-danger/40'
       : 'border-line focus:border-brand-ring focus:ring-brand-ring/40'

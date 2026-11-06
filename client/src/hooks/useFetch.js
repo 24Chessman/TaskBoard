@@ -2,11 +2,12 @@
 // Returns { data, loading, error, status, refetch }:
 //   data     the result, or null while loading or after an error
 //   loading  true while a request is running
-//   error    the API's error message when there is one, otherwise the error's own message ('' when fine)
+//   error    a plain message from utils/errorMessage.js ('' when fine; never a raw axios text)
 //   status   HTTP status of the failed request (e.g. 403, 404) or null, so a screen can react to it
 //   refetch  runs the request again. The old data stays on screen meanwhile, so a parent layout does not unmount.
 // Results of requests that were replaced by a newer one are ignored. fetcher is not a dependency on purpose,
 // so callers can pass an inline arrow function.
+import errorMessage from '../utils/errorMessage.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const useFetch = (fetcher, deps = []) => {
@@ -30,7 +31,7 @@ const useFetch = (fetcher, deps = []) => {
         setState({
           data: null,
           loading: false,
-          error: error.response?.data?.message || error.message || 'Something went wrong',
+          error: errorMessage(error),
           status: error.response?.status ?? null,
         });
       });

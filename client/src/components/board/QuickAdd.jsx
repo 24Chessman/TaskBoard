@@ -3,6 +3,7 @@
 // Enter creates a task with just that title in this status (same title rules and server checks as the create
 // form; an error shows under the field), the field is cleared and keeps focus so several tasks can be typed in a
 // row, Esc closes it. Leaving the field empty and clicking away also closes it.
+import errorMessage from '../../utils/errorMessage.js';
 import { Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createTask } from '../../api/tasks.js';
@@ -50,8 +51,7 @@ const QuickAdd = ({ project, status, columnTitle, onCreated }) => {
       setTitle('');
       onCreated();
     } catch (requestError) {
-      const body = requestError.response?.data;
-      setError(body?.errors?.[0]?.message || body?.message || 'Something went wrong. Please try again.');
+      setError(errorMessage(requestError));
     } finally {
       setSaving(false);
       rootRef.current?.querySelector('input')?.focus();

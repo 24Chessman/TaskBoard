@@ -18,7 +18,7 @@ const AssigneeToggle = ({ user, pressed, onClick }) => (
     aria-label={`Show only tasks assigned to ${user.name}`}
     title={user.name}
     onClick={onClick}
-    className={`rounded-full ring-2 ring-offset-2 ring-offset-app focus:outline-none focus-visible:ring-brand-ring ${pressed ? 'ring-brand' : 'ring-transparent hover:ring-line'}`} // unslop-ignore: the toggle wraps a circular avatar, so its selection ring is a circle (docs/design.md section 5)
+    className={`rounded-full max-sm:p-1 ring-2 ring-offset-2 ring-offset-app focus:outline-none focus-visible:ring-brand-ring ${pressed ? 'ring-brand' : 'ring-transparent hover:ring-line'}`} // unslop-ignore: the toggle wraps a circular avatar, so its selection ring is a circle (docs/design.md section 5)
   >
     <Avatar user={user} size="md" />
   </button>

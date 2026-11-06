@@ -12,7 +12,7 @@ import useFetch from '../hooks/useFetch.js';
 import Forbidden from '../pages/Forbidden.jsx';
 import NotFound from '../pages/NotFound.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
-import Loader from './Loader.jsx';
+import PageSkeleton from './PageSkeleton.jsx';
 import { useShellProject } from './shell/ShellContext.jsx';
 
 const ProjectLayout = () => {
@@ -31,7 +31,7 @@ const ProjectLayout = () => {
   }, [project, projectRole, isOwner, setShellProject]);
   useEffect(() => () => setShellProject(null), [setShellProject]);
 
-  if (loading && !project) return <Loader label="Loading project" />;
+  if (loading && !project) return <PageSkeleton variant="page" label="Loading project" />;
   if (status === 403) return <Forbidden />;
   if (status === 404) return <NotFound />;
   if (error || !project) return <ErrorMessage message={error || 'Could not load the project'} onRetry={refetch} />;

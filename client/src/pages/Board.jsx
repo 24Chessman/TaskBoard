@@ -14,7 +14,7 @@ import useBoardFilters from '../components/board/useBoardFilters.js';
 import Button from '../components/Button.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
-import Loader from '../components/Loader.jsx';
+import PageSkeleton from '../components/PageSkeleton.jsx';
 import PageHeader from '../components/shell/PageHeader.jsx';
 import TaskDrawer from '../components/task/TaskDrawer.jsx';
 import TaskModal from '../components/TaskModal.jsx';
@@ -68,7 +68,7 @@ const Board = () => {
 
   const renderBoard = () => {
     if (error) return <ErrorMessage message={error} onRetry={refetch} />;
-    if (!shown) return <Loader label="Loading tasks" />;
+    if (!shown) return <PageSkeleton variant="board" label="Loading tasks" />;
 
     if (shown.total === 0) {
       return hasFilters ? (
