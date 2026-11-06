@@ -27,14 +27,14 @@ const AuthLayout = ({ children }) => (
     <main className="flex min-w-0 flex-1 flex-col px-4 py-6 sm:px-8">
       <Link
         to="/"
-        className={`inline-flex w-fit items-center gap-1 rounded-md text-sm font-medium text-fg-secondary hover:text-fg ${linkRing}`}
+        className={`inline-flex min-h-10 w-fit items-center gap-1 rounded-md text-sm font-medium text-fg-secondary hover:text-fg ${linkRing}`}
       >
         <ArrowLeft size={16} aria-hidden="true" />
         Back to home
       </Link>
 
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-8">
-        <Link to="/" aria-label="TaskBoard home" className={`mb-8 w-fit rounded-md lg:hidden ${linkRing}`}>
+        <Link to="/" aria-label="TaskBoard home" className={`mb-8 inline-flex min-h-10 w-fit items-center rounded-md lg:hidden ${linkRing}`}>
           <Logo size={32} />
         </Link>
         {children}
