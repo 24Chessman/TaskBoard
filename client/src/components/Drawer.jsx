@@ -30,12 +30,12 @@ export const DrawerPanel = ({ title, titleId, side = 'right', size = 'lg', onClo
       tabIndex={-1}
       className={`absolute inset-y-0 flex w-full flex-col bg-surface shadow-xl focus:outline-none ${sizes[size] || sizes.lg} ${sides[side] || sides.right}`}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
         <h2 id={titleId} className="min-w-0 break-words text-base font-semibold text-fg">
           {title}
         </h2>
         <IconButton icon={X} label="Close" onClick={onClose} />
-      </header>
+      </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
     </div>
   </div>
