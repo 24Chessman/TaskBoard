@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { buttonVariants, focusRing } from '../Button.jsx';
 
 const sizes = {
-  sm: 'h-9 gap-1.5 px-3 text-sm',
+  sm: 'h-10 gap-1.5 px-3 text-sm sm:h-9',
   md: 'h-11 gap-2 px-5 text-sm sm:text-base',
 };
 
