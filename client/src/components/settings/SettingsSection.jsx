@@ -3,10 +3,8 @@
 // title and help left, content right; one column below), contentClassName (default "max-w-xl": the width of the
 // content column).
 // messageOf(error) turns an API error into one readable message (shared by all settings sections).
-export const messageOf = (error) =>
-  error.response?.data?.errors?.[0]?.message ||
-  error.response?.data?.message ||
-  'Something went wrong. Please try again.';
+import errorMessage from '../../utils/errorMessage.js';
+export const messageOf = (error) => errorMessage(error);
 
 const COLUMNS = {
   md: 'md:grid-cols-[14rem_minmax(0,1fr)] md:gap-8',

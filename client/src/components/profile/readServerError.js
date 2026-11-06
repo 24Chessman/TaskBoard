@@ -1,3 +1,5 @@
+import errorMessage from '../../utils/errorMessage.js';
+
 // readServerError(error, fieldMap): turns a failed request into { fieldErrors, formError }.
 // fieldMap renames server field names to form field names. A 409 is an email that is already taken.
 const readServerError = (error, fieldMap = {}) => {
@@ -10,7 +12,7 @@ const readServerError = (error, fieldMap = {}) => {
     });
     return { fieldErrors, formError: '' };
   }
-  return { fieldErrors: {}, formError: data?.message || 'Something went wrong. Please try again.' };
+  return { fieldErrors: {}, formError: errorMessage(error) };
 };
 
 export default readServerError;

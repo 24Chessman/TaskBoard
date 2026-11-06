@@ -1,5 +1,6 @@
 // Login page (/login). Validates email and password, calls useAuth().login, then goes to the page the
 // user originally wanted (location.state.from) or /projects. Shows a notice when the URL has ?reason=expired.
+import errorMessage from '../utils/errorMessage.js';
 import { useState } from 'react';
 import { Lock, Mail } from 'lucide-react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -48,7 +49,7 @@ const Login = () => {
       await login(values.email.trim(), values.password);
       navigate(redirectTo, { replace: true });
     } catch (error) {
-      setFormError(error.response?.data?.message || 'Could not log in. Please try again.');
+      setFormError(errorMessage(error, 'Could not log in. Please try again.'));
       setSubmitting(false);
     }
   };

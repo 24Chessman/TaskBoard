@@ -1,6 +1,7 @@
 // Register page (/register). Asks name, email and password only (never a role), validates them,
 // calls useAuth().register and goes to /projects. Server errors ({ field, message }) are shown under the
 // matching field; a duplicate email (409) is shown under the email field.
+import errorMessage from '../utils/errorMessage.js';
 import { useState } from 'react';
 import { Lock, Mail, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -35,7 +36,7 @@ const readServerError = (error) => {
     });
     return { fieldErrors, formError: '' };
   }
-  return { fieldErrors: {}, formError: data?.message || 'Could not create the account. Please try again.' };
+  return { fieldErrors: {}, formError: errorMessage(error, 'Could not create the account. Please try again.') };
 };
 
 const Register = () => {

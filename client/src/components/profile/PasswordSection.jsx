@@ -61,6 +61,8 @@ const PasswordSection = ({ user, onUpdated }) => {
   return (
     <SettingsSection from="lg" contentClassName="max-w-[30rem]" title="Change password" description="Use at least 6 characters.">
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              {/* Lets password managers know which account this password belongs to */}
+              <input type="text" name="username" autoComplete="username" value={user.email} readOnly tabIndex={-1} aria-hidden="true" className="sr-only" />
               {formError && <ErrorMessage message={formError} />}
               <Input
                 label="Current password"
