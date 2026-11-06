@@ -6,6 +6,7 @@
 // back and an error toast shows the server's message. The pending moves are a small map { taskId: status }; an entry
 // is dropped when fresh data arrives (unless its request is still running) or when its request fails. A task whose
 // move is still running cannot be moved again.
+import errorMessage from '../utils/errorMessage.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { setTaskStatus } from '../api/tasks.js';
 import { applyOverrides, withOverride, withoutOverride } from '../components/board/dnd/dndLogic.js';
@@ -40,7 +41,7 @@ const useOptimisticStatus = ({ projectId, data, refetch }) => {
       } catch (error) {
         running.current.delete(task._id);
         setOverrides((current) => withoutOverride(current, task._id));
-        showToast(error.response?.data?.message || 'Could not move the task', 'error');
+        showToast(errorMessage(error, 'Could not move the task'), 'error');
       }
     },
     [projectId, refetch, showToast]

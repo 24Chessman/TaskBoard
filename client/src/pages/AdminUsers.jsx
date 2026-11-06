@@ -4,6 +4,7 @@
 // delete icon button; both ask for confirmation first. They are disabled on the admin's own row (the server
 // refuses self-delete and removing the last admin anyway). Every refusal from the server is shown in a toast and
 // in a message above the list, so a long one (for example "only owner of: <projects>") stays readable.
+import errorMessage from '../utils/errorMessage.js';
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -13,7 +14,7 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import Input from '../components/Input.jsx';
-import Loader from '../components/Loader.jsx';
+import PageSkeleton from '../components/PageSkeleton.jsx';
 import Pagination from '../components/Pagination.jsx';
 import PageHeader from '../components/shell/PageHeader.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -23,7 +24,7 @@ import useFetch from '../hooks/useFetch.js';
 
 const PAGE_SIZE = 10;
 
-const messageOf = (error) => error.response?.data?.message || 'Something went wrong. Please try again.';
+const messageOf = (error) => errorMessage(error);
 
 const AdminUsers = () => {
   const { user: me } = useAuth();
@@ -111,7 +112,7 @@ const AdminUsers = () => {
   };
 
   const renderUsers = () => {
-    if (loading && !data) return <Loader label="Loading users" />;
+    if (loading && !data) return <PageSkeleton variant="rows" label="Loading users" />;
     if (error) return <ErrorMessage message={error} onRetry={refetch} />;
 
     if (data.data.length === 0) {

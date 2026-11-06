@@ -2,7 +2,8 @@
 // default "sm"), emptyLabel (what a missing user means, used as the tooltip and screen reader name; default
 // "Deleted user"), className (extra classes, for example a ring when avatars overlap).
 // A circle with the user's initials on a soft colour that depends on the name (always the same for the same name),
-// or a neutral "?" when the user is missing.
+// or a neutral "?" when the user is missing. The initials are drawn with CSS (data-initials), not as text, so a button
+// that wraps an avatar is named only by its aria-label (WCAG 2.5.3 Label in Name).
 import { colorForName } from '../utils/nameColors.js';
 
 const sizes = {
@@ -27,10 +28,9 @@ const Avatar = ({ user, size = 'sm', emptyLabel = 'Deleted user', className = ''
       role="img"
       aria-label={label}
       title={label}
-      className={`inline-flex shrink-0 select-none items-center justify-center rounded-full font-medium ${sizes[size] || sizes.sm} ${colorForName(user?.name)} ${className}`} // unslop-ignore: avatars are full circles by design (docs/design.md section 5)
-    >
-      {user ? getInitials(user.name) : '?'}
-    </span>
+      data-initials={user ? getInitials(user.name) : '?'}
+      className={`inline-flex shrink-0 select-none before:content-[attr(data-initials)] items-center justify-center rounded-full font-medium ${sizes[size] || sizes.sm} ${colorForName(user?.name)} ${className}`} // unslop-ignore: avatars are full circles by design (docs/design.md section 5)
+    />
   );
 };
 

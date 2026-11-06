@@ -38,7 +38,7 @@ const TopBar = ({ onOpenNavigation }) => {
         <Link
           to={user ? '/projects' : '/'}
           aria-label={user ? 'TaskBoard, go to projects' : 'TaskBoard home'}
-          className={`rounded-md ${ring}`}
+          className={`inline-flex min-h-10 items-center rounded-md ${ring}`}
         >
           <Logo />
         </Link>
@@ -48,7 +48,7 @@ const TopBar = ({ onOpenNavigation }) => {
         <Dropdown
           label="Open user menu"
           triggerContent={<Avatar user={user} size="md" />}
-          triggerClassName="rounded-full" // unslop-ignore: the trigger wraps a circular avatar, so its focus ring is a circle
+          triggerClassName="rounded-full max-sm:p-1" // unslop-ignore: the trigger wraps a circular avatar, so its focus ring is a circle
           items={menuItems}
           header={
             <div className="min-w-0">
@@ -63,7 +63,7 @@ const TopBar = ({ onOpenNavigation }) => {
       ) : (
         <Link
           to="/login"
-          className={`rounded-md px-3 py-2 text-sm font-medium text-fg-secondary hover:bg-surface-muted hover:text-fg ${ring}`}
+          className={`inline-flex min-h-10 items-center rounded-md px-3 py-2 text-sm font-medium text-fg-secondary hover:bg-surface-muted hover:text-fg ${ring}`}
         >
           Log in
         </Link>

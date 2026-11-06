@@ -16,7 +16,7 @@ import EmptyState from '../components/EmptyState.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import IconButton from '../components/IconButton.jsx';
 import LinkButton from '../components/landing/LinkButton.jsx';
-import Loader from '../components/Loader.jsx';
+import PageSkeleton from '../components/PageSkeleton.jsx';
 import PageHeader from '../components/shell/PageHeader.jsx';
 import useFetch from '../hooks/useFetch.js';
 import useProject from '../hooks/useProject.js';
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   const renderBody = () => {
     if (error) return <ErrorMessage message={error} onRetry={refetch} />;
-    if (!shown) return <Loader label="Loading dashboard" />;
+    if (!shown) return <PageSkeleton variant="charts" label="Loading dashboard" />;
 
     if (shown.total === 0) {
       return (
@@ -50,7 +50,9 @@ const Dashboard = () => {
         <div className="grid gap-4 lg:grid-cols-2">
           <StatusChart byStatus={shown.byStatus} total={shown.total} />
           <PriorityChart byPriority={shown.byPriority} total={shown.total} />
-          <CreatedChart createdPerDay={shown.createdPerDay} />
+          <div className="min-w-0 lg:col-span-2">
+            <CreatedChart createdPerDay={shown.createdPerDay} />
+          </div>
           <WorkloadChart perMember={shown.perMember} unassigned={shown.unassigned} />
           <LabelsChart topLabels={shown.topLabels} />
         </div>

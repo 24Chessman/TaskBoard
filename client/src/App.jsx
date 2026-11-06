@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
-import Loader from './components/Loader.jsx';
+import PageSkeleton from './components/PageSkeleton.jsx';
+import RouteTitle from './components/RouteTitle.jsx';
 import ProjectLayout from './components/ProjectLayout.jsx';
 import AdminRoute from './routes/AdminRoute.jsx';
 import GuestRoute from './routes/GuestRoute.jsx';
@@ -23,45 +24,48 @@ import ComponentDemo from './pages/ComponentDemo.jsx';
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 
 const App = () => (
-  <Routes>
-    {/* The public home: the landing page for guests, a redirect to /projects for signed-in users */}
-    <Route path="/" element={<HomeRoute />} />
+  <>
+    <RouteTitle />
+    <Routes>
+      {/* The public home: the landing page for guests, a redirect to /projects for signed-in users */}
+      <Route path="/" element={<HomeRoute />} />
 
-    <Route element={<GuestRoute />}>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-    </Route>
+      <Route element={<GuestRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
-    {/* Public pages inside the layout: the dev demo (dev only) and NotFound */}
-    <Route element={<Layout />}>
-      {import.meta.env.DEV && <Route path="/dev/components" element={<ComponentDemo />} />}
-      <Route path="*" element={<NotFound />} />
-    </Route>
-
-    <Route element={<ProtectedRoute />}>
+      {/* Public pages inside the layout: the dev demo (dev only) and NotFound */}
       <Route element={<Layout />}>
-        <Route path="/projects" element={<ProjectList />} />
-        <Route path="/projects/new" element={<ProjectCreate />} />
-        <Route path="/projects/:projectId" element={<ProjectLayout />}>
-          <Route index element={<Board />} />
-          <Route
-            path="dashboard"
-            element={
-              <Suspense fallback={<Loader label="Loading dashboard" />}>
-                <Dashboard />
-              </Suspense>
-            }
-          />
-          <Route path="activity" element={<Activity />} />
-          <Route path="settings" element={<ProjectSettings />} />
-        </Route>
-        <Route path="/profile" element={<Profile />} />
-        <Route element={<AdminRoute />}>
-          <Route path="/admin/users" element={<AdminUsers />} />
+        {import.meta.env.DEV && <Route path="/dev/components" element={<ComponentDemo />} />}
+        <Route path="*" element={<NotFound />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/projects" element={<ProjectList />} />
+          <Route path="/projects/new" element={<ProjectCreate />} />
+          <Route path="/projects/:projectId" element={<ProjectLayout />}>
+            <Route index element={<Board />} />
+            <Route
+              path="dashboard"
+              element={
+                <Suspense fallback={<PageSkeleton variant="charts" label="Loading dashboard" />}>
+                  <Dashboard />
+                </Suspense>
+              }
+            />
+            <Route path="activity" element={<Activity />} />
+            <Route path="settings" element={<ProjectSettings />} />
+          </Route>
+          <Route path="/profile" element={<Profile />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/users" element={<AdminUsers />} />
+          </Route>
         </Route>
       </Route>
-    </Route>
-  </Routes>
+    </Routes>
+  </>
 );
 
 export default App;

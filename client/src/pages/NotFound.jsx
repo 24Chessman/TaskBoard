@@ -16,7 +16,7 @@ const NotFound = () => {
     >
       <Link
         to={user ? '/projects' : '/'}
-        className="mt-4 rounded-md px-3 py-2 text-sm font-medium text-brand-fg hover:text-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
+        className="mt-4 inline-flex min-h-10 items-center rounded-md px-3 py-2 text-sm font-medium text-brand-fg hover:text-brand-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
       >
         {user ? 'Back to Projects' : 'Back to home'}
       </Link>

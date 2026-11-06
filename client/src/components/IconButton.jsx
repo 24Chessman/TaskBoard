@@ -5,7 +5,7 @@
 import { buttonVariants, focusRing } from './Button.jsx';
 
 const sizes = {
-  sm: 'h-9 w-9 sm:h-7 sm:w-7',
+  sm: 'h-10 w-10 sm:h-7 sm:w-7',
   md: 'h-10 w-10 sm:h-8 sm:w-8',
 };
 

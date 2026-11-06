@@ -21,7 +21,7 @@ export const Breadcrumbs = ({ items }) => (
               <>
                 <Link
                   to={item.to}
-                  className="truncate rounded hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
+                  className="inline-flex items-center truncate rounded max-sm:-my-2.5 max-sm:py-2.5 hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
                 >
                   {item.label}
                 </Link>
