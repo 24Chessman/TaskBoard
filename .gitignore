@@ -26,3 +26,11 @@ Thumbs.db
 
 # Playwright MCP working folder
 .playwright-mcp/
+
+# LaTeX build files (report in docs/report)
+*.aux
+*.toc
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
