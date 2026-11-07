@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client:
+    name: Client build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+        working-directory: client
+      - run: npm run build
+        working-directory: client
+
+  server:
+    name: Server smoke test
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+      - name: Install server dependencies
+        run: npm ci
+        working-directory: server
+      - name: Syntax-check every server file
+        run: find server/src -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Build the client
+        run: npm run build
+      - name: Start the server in production mode and check it
+        run: |
+          set -eu
+          export NODE_ENV=production PORT=5055
+          export MONGO_URI=mongodb://127.0.0.1:27017/taskboard_ci
+          export JWT_SECRET="$(openssl rand -hex 32)"
+          node server/src/server.js > server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true; cat server.log' EXIT
+          base=http://127.0.0.1:5055
+          for _ in $(seq 1 30); do
+            curl -fs "$base/api/health" | grep -q '"db":"connected"' && break
+            sleep 1
+          done
+          health="$(curl -fs "$base/api/health")"
+          echo "$health" | grep -q '"status":"ok"'
+          echo "$health" | grep -q '"db":"connected"'
+          curl -fs "$base/" | grep -q 'id="root"'
+          test "$(curl -s -o nope.json -w '%{http_code}' "$base/api/nope")" = 404
+          grep -q '"success":false' nope.json
+          for name in auth tasks; do
+            npx --yes newman@6.2.3 run "docs/postman/$name.postman_collection.json" \
+              --env-var baseUrl="$base/api" --timeout-request 20000 --delay-request 100
+          done
