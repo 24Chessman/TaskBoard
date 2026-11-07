@@ -19,7 +19,7 @@ const ClosingSection = () => (
           </LinkButton>
           <Link
             to="/login"
-            className="rounded-md px-1 py-2 text-sm font-medium text-brand-fg underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
+            className="inline-flex min-h-10 items-center rounded-md px-1 text-sm font-medium text-brand-fg underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring"
           >
             Log in
           </Link>
