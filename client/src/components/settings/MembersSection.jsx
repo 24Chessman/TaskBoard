@@ -82,7 +82,7 @@ const MembersSection = ({ project, refreshProject }) => {
       <ConfirmDialog
         isOpen={Boolean(pendingRemove)}
         title="Remove member?"
-        message={`Remove ${pendingRemove?.user.name} from this project? Tasks assigned to them in this project become unassigned.`}
+        message={`Remove ${pendingRemove?.user.name} from this project? Tasks they lead in this project will have no lead.`}
         confirmLabel="Remove"
         onConfirm={handleRemove}
         onCancel={() => setPendingRemove(null)}

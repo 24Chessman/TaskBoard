@@ -186,7 +186,7 @@ const AdminUsers = () => {
       <ConfirmDialog
         isOpen={Boolean(pendingDelete)}
         title={pendingDelete ? `Delete ${pendingDelete.name}?` : 'Delete user?'}
-        message="They are removed from every project and unassigned from their tasks. Their comments and activity stay. This cannot be undone."
+        message="They are removed from every project and no longer lead any task. Their comments and activity stay. This cannot be undone."
         confirmLabel="Delete"
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
