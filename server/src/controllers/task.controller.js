@@ -81,7 +81,7 @@ const readTaskFields = (body, project) => {
 
   if (assignee !== undefined && assignee !== null) {
     readObjectId(assignee, 'assignee');
-    if (!isMember(project, assignee)) throw invalid('assignee', 'Assignee must be a member of the project');
+    if (!isMember(project, assignee)) throw invalid('assignee', 'Lead must be a member of the project');
     fields.assignee = assignee;
   }
 
@@ -197,7 +197,7 @@ export const getTask = asyncHandler(async (req, res) => {
 export const updateTask = asyncHandler(async (req, res) => {
   const task = await loadTask(req);
   if (!isOwner(req) && !isCreator(req, task) && !isAssignee(req, task)) {
-    throw new ApiError(403, 'Only the project owner, the task creator or the assignee can edit this task');
+    throw new ApiError(403, 'Only the project owner, the task creator or the lead can edit this task');
   }
 
   const fields = readTaskFields(req.body, req.project);
