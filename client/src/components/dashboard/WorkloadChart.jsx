@@ -15,18 +15,18 @@ const WorkloadChart = ({ perMember, unassigned }) => {
   const rows = perMember.map((member, index) => ({ ...member, id: String(index), rest: member.total - member.done, text: `${member.done} / ${member.total}` }));
   const max = Math.max(1, ...rows.map((row) => row.total));
   const summary = rows.length
-    ? `Workload by member: ${rows.map((row) => `${row.name} ${row.done} of ${row.total} done`).join(', ')}.${unassigned > 0 ? ` ${unassigned} open tasks have no assignee.` : ''}`
-    : 'No tasks are assigned to anyone yet.';
+    ? `Workload by member: ${rows.map((row) => `${row.name} ${row.done} of ${row.total} done`).join(', ')}.${unassigned > 0 ? ` ${unassigned} open tasks have no lead.` : ''}`
+    : 'No task has a lead yet.';
 
   return (
     <ChartCard
       title="Workload by member"
-      description="Tasks assigned to each person, and how many of them are done."
+      description="Tasks each person leads, and how many of them are done."
       summary={summary}
       data={{ caption: 'Workload by member', columns: ['Member', 'Done', 'Total tasks'], rows: rows.map((row) => [row.name, row.done, row.total]) }}
     >
       {rows.length === 0 ? (
-        <p className="py-6 text-sm text-fg-secondary">No tasks are assigned to anyone yet.</p>
+        <p className="py-6 text-sm text-fg-secondary">No task has a lead yet.</p>
       ) : (
         <ResponsiveContainer width="100%" height={rows.length * ROW + 8}>
           <BarChart layout="vertical" data={rows} margin={{ top: 4, right: 52, bottom: 4, left: 0 }} accessibilityLayer={false}>
@@ -55,7 +55,7 @@ const WorkloadChart = ({ perMember, unassigned }) => {
       )}
       {unassigned > 0 && (
         <p className="mt-3 text-sm text-fg">
-          <span className="font-mono tabular-nums">{unassigned}</span> open {unassigned === 1 ? 'task has' : 'tasks have'} no assignee
+          <span className="font-mono tabular-nums">{unassigned}</span> open {unassigned === 1 ? 'task has' : 'tasks have'} no lead
         </p>
       )}
     </ChartCard>

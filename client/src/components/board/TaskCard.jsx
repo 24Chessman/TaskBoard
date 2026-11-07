@@ -23,7 +23,7 @@ export const describeTask = (task) => {
     `Priority ${(PRIORITY_BADGES[task.priority] || PRIORITY_BADGES.medium).label}`,
     `Status ${(STATUS_LOZENGES[task.status] || STATUS_LOZENGES.todo).label}`,
     task.dueDate ? `${overdue ? 'Overdue, was due' : 'Due'} ${formatDate(toDateKey(task.dueDate))}` : 'No due date',
-    task.assignee ? `Assigned to ${task.assignee.name}` : 'Unassigned',
+    task.assignee ? `Lead ${task.assignee.name}` : 'No lead',
   ];
   if (task.labels.length > 0) parts.push(`Labels ${task.labels.join(', ')}`);
   if (task.githubIssue?.url) parts.push('Linked GitHub issue');
@@ -60,7 +60,7 @@ const TaskCard = ({ task, onOpen, buttonRef, buttonProps, dragging = false }) =>
         )}
         {hiddenLabels > 0 && <Badge title={task.labels.slice(MAX_LABELS).join(', ')}>+{hiddenLabels}</Badge>}
         {/* Without a due date the avatar joins the first row, so the card stays short */}
-        {!task.dueDate && <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" className="ml-auto" />}
+        {!task.dueDate && <Avatar user={task.assignee} size="xs" emptyLabel="No lead" className="ml-auto" />}
       </span>
 
       {task.dueDate && (
@@ -70,7 +70,7 @@ const TaskCard = ({ task, onOpen, buttonRef, buttonProps, dragging = false }) =>
             {overdue ? 'Overdue ' : ''}
             {formatDate(toDateKey(task.dueDate))}
           </span>
-          <Avatar user={task.assignee} size="xs" emptyLabel="Unassigned" />
+          <Avatar user={task.assignee} size="xs" emptyLabel="No lead" />
         </span>
       )}
     </button>

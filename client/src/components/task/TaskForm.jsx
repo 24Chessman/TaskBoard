@@ -149,8 +149,8 @@ const TaskForm = ({ project, task, defaultStatus, onSaved, onCancel, onDirtyChan
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </Select>
-        <Select label="Assignee" name="assignee" value={values.assignee} onChange={handleChange} error={fieldErrors.assignee}>
-          <option value="">Unassigned</option>
+        <Select label="Lead" name="assignee" value={values.assignee} onChange={handleChange} error={fieldErrors.assignee}>
+          <option value="">No lead</option>
           {members.map((member) => (
             <option key={member.user._id} value={member.user._id}>
               {member.user.name}

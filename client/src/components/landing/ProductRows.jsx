@@ -12,9 +12,9 @@ const ProductRows = () => (
     <FeatureRow
       id="product"
       title="See every task in its column"
-      text="Tasks move through To Do, In Progress, Review and Done. Search or filter by priority, assignee, label and due date, and the filters stay in the address bar."
+      text="Tasks move through To Do, In Progress, Review and Done. Search or filter by priority, lead, label and due date, and the filters stay in the address bar."
       facts={[
-        'Priority, labels, due date and assignee on every card',
+        'Priority, labels, due date and lead on every card',
         'Overdue tasks are marked in red with an icon and the word Overdue',
         'Filter and search without leaving the board',
       ]}
@@ -23,7 +23,7 @@ const ProductRows = () => (
     <FeatureRow
       title="Everything about a task in one place"
       text="Open a task to edit its details and read the discussion in one view. Comments show who wrote them and when."
-      facts={['Status, priority, assignee, labels and due date', 'Comments with the author and the time', 'Deleting a task asks you to confirm']}
+      facts={['Status, priority, lead, labels and due date', 'Comments with the author and the time', 'Deleting a task asks you to confirm']}
       mock={<DrawerMock />}
       reverse
     />
