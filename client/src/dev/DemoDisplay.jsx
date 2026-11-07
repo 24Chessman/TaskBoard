@@ -52,7 +52,7 @@ const DemoDisplay = () => (
         <Avatar user={people[2]} size="md" />
         <Avatar user={people[3]} size="md" />
         <Avatar user={null} size="md" />
-        <Avatar user={null} size="md" emptyLabel="Unassigned" />
+        <Avatar user={null} size="md" emptyLabel="No lead" />
       </div>
     </Section>
 

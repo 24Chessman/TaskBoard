@@ -72,8 +72,8 @@ const TaskDetailsPane = ({ task, project, onChanged }) => {
         <Row label="Priority">
           <PriorityBadge priority={task.priority} />
         </Row>
-        <Row label="Assignee">
-          <Person user={task.assignee} emptyLabel="Unassigned" />
+        <Row label="Lead">
+          <Person user={task.assignee} emptyLabel="No lead" />
         </Row>
         <Row label="Labels">
           {task.labels.length === 0 ? (

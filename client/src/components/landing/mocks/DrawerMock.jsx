@@ -48,7 +48,7 @@ const DrawerMock = ({ className = '' }) => (
         <Detail label="Priority">
           <PriorityBadge priority="high" />
         </Detail>
-        <Detail label="Assignee">
+        <Detail label="Lead">
           <Avatar user={PEOPLE.lee} size="xs" />
           Lee Park
         </Detail>

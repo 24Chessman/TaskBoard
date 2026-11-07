@@ -15,7 +15,7 @@ const AssigneeToggle = ({ user, pressed, onClick }) => (
   <button
     type="button"
     aria-pressed={pressed}
-    aria-label={`Show only tasks assigned to ${user.name}`}
+    aria-label={`Show only tasks led by ${user.name}`}
     title={user.name}
     onClick={onClick}
     className={`rounded-full max-sm:p-1 ring-2 ring-offset-2 ring-offset-app focus:outline-none focus-visible:ring-brand-ring ${pressed ? 'ring-brand' : 'ring-transparent hover:ring-line'}`} // unslop-ignore: the toggle wraps a circular avatar, so its selection ring is a circle (docs/design.md section 5)
@@ -39,7 +39,7 @@ const BoardToolbar = ({ members, filters, searchText, onSearchText, labelText, o
         className="min-w-0 basis-full sm:flex-1 sm:basis-auto sm:max-w-xs"
       />
 
-      <div role="group" aria-label="Filter by assignee" className="flex items-center -space-x-0.5 px-1">
+      <div role="group" aria-label="Filter by lead" className="flex items-center -space-x-0.5 px-1">
         {members.map((member) => (
           <AssigneeToggle
             key={member.user._id}
